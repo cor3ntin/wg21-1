@@ -192,6 +192,17 @@ Rust's [`Option`](https://doc.rust-lang.org/std/option/enum.Option.html) class p
 
 It would be possible to merge the `map` and `bind` functions into one single function which detects if the callable argument will return a `std::optional<T>`, and, if so, return a `std:optional<T>` rather than a `std::optional<std::optional<T>>`. However, I think that this conflates the uses of two functions: `map` is for functions which always produce a result, `bind` is for functions which may or may not. Furthermore, the second argument to `bind` does not make sense for `map`.
 
+### `operator|`
+
+If it was decided to have only `map`, then it might be useful to provide `operator|` with the same semantics. This would allow the following use case:
+
+```
+return a() | b
+           | c
+           | d
+           | e;
+```           
+
 ### Alternative names
 
 `map` may confuse users who are more familiar with its use as a data structure, or consider the common array map from other languages to be different from this application. Some other possible names are `then`, `when_value`, `fmap`, `transform`.
@@ -361,5 +372,5 @@ template <class F> constexpr *see below* map(F&& f) const&&;
 Acknowledgements
 ---------------
 
-Thank you to [Kenneth Benzie](https://twitter.com/KmBenzie) for the idea to add an error-handling argument to `bind`. Thanks to [Vittorio Romeo](https://twitter.com/supahvee1234) and [Jonathan Müller](https://twitter.com/foonathan) for initial review and suggestions.
+Thank you to [Kenneth Benzie](https://twitter.com/KmBenzie) for the idea to add an error-handling argument to `bind`. Thanks to [Vittorio Romeo](https://twitter.com/supahvee1234), [Jonathan Müller](https://twitter.com/foonathan), and [Adi Shavit](https://twitter.com/AdiShavit) for initial review and suggestions.
 
