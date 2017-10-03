@@ -169,6 +169,8 @@ if (!d) err("d failed");
 
 auto re = e(*d);
 if (!e) err("e failed");
+
+return re;
 ```
 
 
