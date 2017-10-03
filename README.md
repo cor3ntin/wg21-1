@@ -363,6 +363,3 @@ Acknowledgements
 
 Thank you to [Kenneth Benzie](https://twitter.com/KmBenzie) for the idea to add an error-handling argument to `bind`. Thanks to [Vittorio Romeo](https://twitter.com/supahvee1234) and [Jonathan Müller](https://twitter.com/foonathan) for initial review and suggestions.
 
-License
--------
-Distributed under the [Boost Software License, Version 1.0](http://www.boost.org/LICENSE_1_0.txt).
