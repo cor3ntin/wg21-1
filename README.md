@@ -154,10 +154,22 @@ return a().bind(b, err("b failed"))
 This code is equivalent to:
 
 ```
+auto err = [](auto msg){ throw std::runtime_error{msg}; };
 auto ra = a();
 if (!a) return std::nullopt;
 
 auto rb = b(*a);
+if (!b) err("b failed");
+
+auto rc = c(*b);
+if (!c) err("c failed");
+
+auto rd = d(*c);
+if (!d) err("d failed");
+
+auto re = e(*d);
+if (!e) err("e failed");
+```
 
 
 How other languages handle this
