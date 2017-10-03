@@ -4,12 +4,12 @@ Monadic operations for `std::optional`
 Abstract
 --------
 
-#### TODO
+`std::optional` will be a very important vocabulary type in C++17 and up. Some uses of it can be very verbose and would benefit from operations which allow functional composition. I propose adding `map` and `bind` member functions to `std::optional` to support this monadic style of programming.
 
 Motivation
 ----------
 
-`std::optional` aims to be a "vocabulary type", i.e. the canonical type to represent some programming concept. As such, `std::optional` will become widely used to represent an object which may or may not contain a value. Unfortunately, chaining together many computations which may or may not produce a value can be verbose, as error checking code will be mixed in with the actual programming logic. Take the following example:
+`std::optional` aims to be a "vocabulary type", i.e. the canonical type to represent some programming concept. As such, `std::optional` will become widely used to represent an object which may or may not contain a value. Unfortunately, chaining together many computations which may or may not produce a value can be verbose, as empty-checking code will be mixed in with the actual programming logic. Take the following example:
 
 ```
 float get_foo(int i);
@@ -37,22 +37,40 @@ std::optional<int> with_optional_icky(int i) {
     auto f = maybe_get_foo(i);
     if (!f) return std::nullopt;
 
-    auto func = maybe_get_func(f.value());
+    auto func = maybe_get_func(*f);
     if (!func) return std::nullopt;
 
-    auto s = maybe_get_bar(f.value());
+    auto s = maybe_get_bar(*f);
     if (!s) return std::nullopt;
     
-    return func.value()(s.value());
+    return func.value()(*s);
 }
 ```
 
 Our code now has a lot of boilerplate to deal with the case where a step fails. Not only does this increase the noise and cognitive load of the function, but if we forget to put in a check, then suddenly we're throwing an exception if we do a bad optional access.
 
+Another possibility would be to call `.value()` on the optionals and let the exception be thrown and caught like so:
+
+```
+std::optional<int> with_optional_exceptions(int i) {
+   try {
+      auto f = maybe_get_foo(i);
+      auto func = maybe_get_func(f.value());
+      auto s = maybe_get_bar(f.value());
+      return func.value()(s.value());
+   }
+   catch (std::bad_optional_access& e) {
+      return std::nullopt;
+   }
+}
+```
+
+If some of those function calls can reasonably not produce a value, then this code is using exceptions for control flow. This is commonly seen as bad practice, and has an item warning against it in the [C++ Core Guidelines](https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#e3-use-exceptions-for-error-handling-only).
+
 Proposed solution
 -----------------
 
-One way to solve this would be to add additional member functions to `std::optional` in order to push the handling off to the side. The implementation in this repository adds two member functions to achieve this: `map` and `bind`. Using these new functions, the code above becomes this:
+This paper proposes adding additional member functions to `std::optional` in order to push the handling of empty states off to the side. The proposed additions are `map` and `bind`. Using these new functions, the code above becomes this:
 
 ```
 std::optional<int> with_optional_good(int i) {
@@ -123,20 +141,24 @@ std::optional<int> foo() {
 }
 ```
 
-Considerations
---------------
+We can also do chaining where failures can result in exceptions being thrown:
 
-#### TODO
+```
+auto err = [](auto msg){ throw std::runtime_error{msg}; };
+return a().bind(b, err("b failed"))
+          .bind(c, err("c failed"))
+          .bind(d, err("d failed"))
+          .bind(e, err("e failed"));
+```
 
-### `map` only
+This code is equivalent to:
 
-#### TODO
+```
+auto ra = a();
+if (!a) return std::nullopt;
 
-### Alterative names
+auto rb = b(*a);
 
-`map` may confuse users who are more familiar with its use as a data structure, or consider the common array map from other languages to be different from this application. Some other possible names are `then`, `when_value`, `fmap`, `transform`.
-
-`bind` may confuse those more familiar with `std::bind`. An alternative names are `compose`, `chain`, and `and_then`.
 
 How other languages handle this
 -------------------------------
@@ -145,6 +167,22 @@ How other languages handle this
 
 Rust has an `Option` class where the functor part of `map` is called `map`, and `bind` is called `and_then`. It also provides many additional member functions like `or_else` to return the option if it has a value and call a function otherwise.
 
+Considerations
+--------------
+
+### More functions
+
+Rust's [`Option`](https://doc.rust-lang.org/std/option/enum.Option.html) class provides a lot more than `map` and `bind` (`and_then`). If the idea to add `map` and `bind` is received favourably, then we can think about what other additions we may wan to make.
+
+### `map` only
+
+It would be possible to merge the `map` and `bind` functions into one single function which detects if the callable argument will return a `std::optional<T>`, and, if so, return a `std:optional<T>` rather than a `std::optional<std::optional<T>>`. However, I think that this conflates the uses of two functions: `map` is for functions which always produce a result, `bind` is for functions which may or may not. Furthermore, the second argument to `bind` does not make sense for `map`.
+
+### Alternative names
+
+`map` may confuse users who are more familiar with its use as a data structure, or consider the common array map from other languages to be different from this application. Some other possible names are `then`, `when_value`, `fmap`, `transform`.
+
+`bind` may confuse those more familiar with `std::bind`. An alternative names are `compose`, `chain`, and `and_then`.
 
 
 Pitfalls
@@ -153,16 +191,26 @@ Pitfalls
 Users may want to write code like this:
 
 ```
-std::optional<int> foo() {
+std::optional<int> foo(int i) {
     return
       a().bind(b)
-         .bind(get_func());
+         .bind(get_func(i));
 }
 ```
 
 The problem with this is `get_func` will be called regardless of whether `b` returns an empty `std::optional` or not. If it has side effects, then this may not be what the user wants.
 
-#### TODO consider `bind_with` to defer evaluation
+One possible solution to this would be to add an additional function, `bind_with` which will take a callable which provides what you want to `bind` to:
+
+```
+std::optional<int> foo(int i) {
+    return
+      a().bind(b)
+         .bind_with([i](){return get_func(i)});
+}
+```
+
+This kind of usage might benefit from the [lift operator](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3617.htm) or [abbreviated lambdas](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0573r0.html).
 
 
 Other solutions
@@ -191,9 +239,9 @@ std::optional<int> foo() {
 }
 ```
 
-#### TODO Uniform Call Syntax
+My proposal is not necessarily an alternative to this proposal; compatibility between the two could be ensured and the generic proposal could use my proposal as part of its implementation. This would allow users to use both the generic syntax for flexibility and extensibility, and the member-function syntax for brevity and clarity.
 
-My proposal is not necessarily an alternative to this proposal; compatibility between the two could be ensured and the generic proposal could use my proposal as part of its implementation. This would allow users to use both the generic syntax for flexibility and extensibility and the member-function syntax for brevity and clarity.
+If `do` notation or [unified call syntax](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0301r1.html) is accepted, then this proposal may not be necessary.
 
 Interaction with other proposals
 --------------------------------
@@ -201,6 +249,11 @@ Interaction with other proposals
 There is a proposal for [`std::expected`](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0323r2.pdf) which would benefit from many of these same ideas. If the idea to add monadic interfaces to standard library classes on a case-by-case basis is chosen rather than a unified non-member function interface, then compatibility between this proposal and the `std::expected` one should be maintained.
 
 Mapping functions which return `void` is supported, but is a pain to implement since `void` is not a regular type. If the [Regular Void](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0146r1.html) proposal was accepted, implementation would be simpler and the results of the operation would conform to users expectations better (i.e. return `std::optional<void>` instead of `std::optional<std::monostate>`.
+
+Implementation experience
+-------------------------
+
+This proposal has been implemented [here](https://github.com/TartanLlama/monadic-optional).
 
 ---------------------------------------
 ---------------------------------------
@@ -250,27 +303,27 @@ template <class F> constexpr *see below* bind(F&& f) const&&;
 ---------------------------------------
 
 ```
-template <class F, class E> constexpr *see below* bind(F&& f, E&& e) &;
-template <class F, class E> constexpr *see below* bind(F&& f, E&& e) const&;
+template <class F, class E> *see below* bind(F&& f, E&& e) &;
+template <class F, class E> *see below* bind(F&& f, E&& e) const&;
 ```
 
 *Requires*: `std::invoke(std::forward<F>(f), value())` returns a `std::optional<U>` for some `U`.
 
 *Returns*: Let `U` be the result of `std::invoke(std::forward<F>(f), value())`. Returns a `std::optional<U>`. The return value is empty if `*this` is empty, otherwise the return value of `std::invoke(std::forward<F>(f), value())` is returned.
 
-*Effects*: If `*this` is not empty and `std::invoke(std::forward<F>(f), value())` returns an empty `std::optional`, then `e` is called.
+*Effects*: If `*this` is not empty and `std::invoke(std::forward<F>(f), value())` returns an empty `std::optional`, then `e` is called with no arguments.
 
 ---------------------------------------
 
 ```
-template <class F, class E> constexpr *see below* bind(F&& f, E&& e) &&;
-template <class F, class E> constexpr *see below* bind(F&& f, E&& e) const&&;
+template <class F, class E> *see below* bind(F&& f, E&& e) &&;
+template <class F, class E> *see below* bind(F&& f, E&& e) const&&;
 ```
 *Requires*: `std::invoke(std::forward<F>(f), std::move(value()))` returns a `std::optional<U>` for some `U`.
 
 *Returns*: Let `U` be the result of `std::invoke(std::forward<F>(f), std::move(value()))`. Returns a `std::optional<U>`. The return value is empty if `*this` is empty, otherwise the return value of `std::invoke(std::forward<F>(f), std::move(value()))` is returned.
 
-*Effects*: If `*this` is not empty and `std::invoke(std::forward<F>(f), std::move(value()))` returns an empty `std::optional`, then `e` is called.
+*Effects*: If `*this` is not empty and `std::invoke(std::forward<F>(f), std::move(value()))` returns an empty `std::optional`, then `e` is called with no arguments.
 
 ---------------------------------------
 
@@ -291,7 +344,7 @@ template <class F> constexpr *see below* map(F&& f) const&&;
 ---------------------------------------
 ---------------------------------------
 
-Acknowledgments
+Acknowledgements
 ---------------
 
 Thank you to [Kenneth Benzie](https://twitter.com/KmBenzie) for the idea to add an error-handling argument to `bind`. Thanks to [Vittorio Romeo](https://twitter.com/supahvee1234) and [Jonathan Müller](https://twitter.com/foonathan) for initial review and suggestions.
