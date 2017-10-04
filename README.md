@@ -394,5 +394,5 @@ template <class F> constexpr *see below* map(F&& f) const&&;
 Acknowledgements
 ---------------
 
-Thank you to [Kenneth Benzie](https://twitter.com/KmBenzie) for the idea to add an error-handling argument to `bind`. Thanks to [Vittorio Romeo](https://twitter.com/supahvee1234), [Jonathan Müller](https://twitter.com/foonathan), and [Adi Shavit](https://twitter.com/AdiShavit) for initial review and suggestions.
+ Thanks to Kenneth Benzie, Vittorio Romeo, Jonathan Müller, Adi Shavit, Nicol Bolas, and Barry Revzin for review and suggestions.
 
