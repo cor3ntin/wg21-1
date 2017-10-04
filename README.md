@@ -26,12 +26,9 @@ int no_optional(int i) {
 This code is pretty straightforward and concise. But what happens if all of these functions could reasonably not produce a result?
 
 ```
-std::optional<float>
-maybe_get_foo(int i);
-std::optional<std::string>
-maybe_get_bar(float f);
-std::optional<std::function<int(std::string)>>
-maybe_get_func(float f);
+std::optional<float> maybe_get_foo(int i);
+std::optional<std::string> maybe_get_bar(float f);
+std::optional<std::function<int(std::string)>> maybe_get_func(float f);
 
 std::optional<int> with_optional_icky(int i) {
     auto f = maybe_get_foo(i);
@@ -85,6 +82,14 @@ We've successfully got rid of all the manual checking; all that we need now is a
 
 #### `map`
 
+`map` applies a function to the value stored in the optional and returns the result wrapped in an optional. If there is no stored value, then it returns an empty optional.
+
+For example, if you have a `std::optional<std::string>` and you want to get the size of the string if one is available, you could write this:
+
+```
+opt_string.map(&std::string::size);
+```
+
 `map` has two overloads (in pseudocode for exposition):
 
 ```
@@ -108,6 +113,14 @@ If you come from a functional programming or category theory background, you may
 
 #### `bind`
 
+`bind` is like `map`, but it is used on functions which may not return a value.
+
+For example, say you have `std::optional<std::string>` and a function like `std::stoi` which returns a `std::optional<int>` instead of throwing on failure. Rather than manually checking the optional string before calling, you could do this:
+
+```
+opt_string.bind(stoi);
+```
+
 `bind` has two overloads which look roughly like this:
 
 ```
@@ -121,7 +134,7 @@ class optional {
 };
 ```
 
-The first takes any callable object which returns a `std::optional`. If the `optional` does not have a value stored, then an empty optional is returned. Otherwise, the given function is called with the stored value as an argument, and the return value is returned.
+The first takes any callable object which returns a `std::optional`. If the optional does not have a value stored, then an empty optional is returned. Otherwise, the given function is called with the stored value as an argument, and the return value is returned.
 
 The second overload does the same, but if the execution of `func` returns an empty optional, the `error` function is called before returning. This allows the user to do some logging or throw an exception if they like.
 
@@ -141,38 +154,42 @@ std::optional<int> foo() {
 }
 ```
 
+Taking the example of `stoi` from earlier, we could carry out mathematical operations on the result by just adding `map` calls:
+
+```
+opt_string.bind(stoi)
+          .map([](auto i) { return i * 2; });
+```
+
 We can also do chaining where failures can result in exceptions being thrown:
 
 ```
-auto err = [](auto msg){ throw std::runtime_error{msg}; };
-return a().bind(b, err("b failed"))
-          .bind(c, err("c failed"))
-          .bind(d, err("d failed"))
-          .bind(e, err("e failed"));
+return a().bind(b, throw std::runtime_error("b failed"))
+          .bind(c, throw std::runtime_error("c failed"))
+          .bind(d, throw std::runtime_error("d failed"))
+          .bind(e, throw std::runtime_error("e failed"));
 ```
 
 This code is equivalent to:
 
 ```
-auto err = [](auto msg){ throw std::runtime_error{msg}; };
 auto ra = a();
 if (!a) return std::nullopt;
 
 auto rb = b(*a);
-if (!b) err("b failed");
+if (!b) throw std::runtime_error("b failed");
 
 auto rc = c(*b);
-if (!c) err("c failed");
+if (!c) throw std::runtime_error("c failed");
 
 auto rd = d(*c);
-if (!d) err("d failed");
+if (!d) throw std::runtime_error("d failed");
 
 auto re = e(*d);
-if (!e) err("e failed");
+if (!e) throw std::runtime_error("e failed");
 
 return re;
 ```
-
 
 How other languages handle this
 -------------------------------
@@ -186,7 +203,7 @@ Considerations
 
 ### More functions
 
-Rust's [`Option`](https://doc.rust-lang.org/std/option/enum.Option.html) class provides a lot more than `map` and `bind` (`and_then`). If the idea to add `map` and `bind` is received favourably, then we can think about what other additions we may wan to make.
+Rust's [`Option`](https://doc.rust-lang.org/std/option/enum.Option.html) class provides a lot more than `map` and `bind` (`and_then`). If the idea to add `map` and `bind` is received favourably, then we can think about what other additions we may want to make.
 
 ### `map` only
 
@@ -208,6 +225,10 @@ return a() | b
 `map` may confuse users who are more familiar with its use as a data structure, or consider the common array map from other languages to be different from this application. Some other possible names are `then`, `when_value`, `fmap`, `transform`.
 
 `bind` may confuse those more familiar with `std::bind`. An alternative names are `compose`, `chain`, and `and_then`.
+
+### `catch_error`
+
+Instead of overloading `bind` for error handling, a `catch_error` function could be added. Instead of writing `a.bind(b, on_fail)`, you'd write `a.bind(b).catch_error(on_fail)`. 
 
 
 Pitfalls
@@ -235,13 +256,11 @@ std::optional<int> foo(int i) {
 }
 ```
 
-This kind of usage might benefit from the [lift operator](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3617.htm) or [abbreviated lambdas](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0573r0.html).
-
 
 Other solutions
 ----------------------
 
-There is a proposal for adding a [general monadic interface](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0650r0.pdf) to C++. Unfortunately doing the kind of composition described above would be very verbose with the current proposal without some kind of Haskell-style `do` notation. If my understanding is correct, then the code for my first solution above would look like this:
+There is a proposal for adding a [general monadic interface](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0650r0.pdf) to C++. Unfortunately doing the kind of composition described above would be very verbose with the current proposal without some kind of Haskell-style `do` notation. The code for my first solution above would look like this:
 
 ```
 std::optional<int> with_optional_good(int i) {
@@ -266,7 +285,7 @@ std::optional<int> foo() {
 
 My proposal is not necessarily an alternative to this proposal; compatibility between the two could be ensured and the generic proposal could use my proposal as part of its implementation. This would allow users to use both the generic syntax for flexibility and extensibility, and the member-function syntax for brevity and clarity.
 
-If `do` notation or [unified call syntax](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0301r1.html) is accepted, then this proposal may not be necessary.
+If `do` notation or [unified call syntax](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0301r1.html) is accepted, then my proposal may not be necessary, as use of the generic monadic functionality would allow the same or similarly concise syntax.
 
 Interaction with other proposals
 --------------------------------
@@ -274,6 +293,9 @@ Interaction with other proposals
 There is a proposal for [`std::expected`](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0323r2.pdf) which would benefit from many of these same ideas. If the idea to add monadic interfaces to standard library classes on a case-by-case basis is chosen rather than a unified non-member function interface, then compatibility between this proposal and the `std::expected` one should be maintained.
 
 Mapping functions which return `void` is supported, but is a pain to implement since `void` is not a regular type. If the [Regular Void](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0146r1.html) proposal was accepted, implementation would be simpler and the results of the operation would conform to users expectations better (i.e. return `std::optional<void>` instead of `std::optional<std::monostate>`.
+
+Any proposals which make lambdas or overload sets easier to write and pass around will greatly improve this proposal. In particular, proposals for [lift operators](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3617.htm) and [abbreviated lambdas](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0573r0.html) would ensure that the clean style is preserved in the face of many anonymous functions and overloads.
+
 
 Implementation experience
 -------------------------
