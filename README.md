@@ -1,12 +1,10 @@
 Monadic operations for `std::optional`
 ======================================
 
-|----------------|--------------------------------------------------|
-|Document number | PXXX                                             |
-|Date            | 2017-10-04                                       |
-|Project         | ISO/IEC JTC1 SC22 WG21 Programming Language C++  |
-|Reply-to        | Simon Brand <simonrbrand@gmail.com>              |
-|----------------|--------------------------------------------------|
+Document number: PXXX
+Date: 2017-10-04
+Project: ISO/IEC JTC1 SC22 WG21 Programming Language C++
+Reply-to: Simon Brand <simonrbrand@gmail.com>
 
 Abstract
 --------
