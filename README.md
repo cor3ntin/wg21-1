@@ -1,7 +1,7 @@
 Monadic operations for `std::optional`
 ======================================
 
-Document number: PXXX
+Document number: DXXXr0
 
 Date: 2017-10-04
 
