@@ -107,7 +107,7 @@ Standarese Wording available on request.
 
 Alternatives
 ------------
-Currently, the workarounds for accessing the last elements of a variadic function template usually involves tuple manipulations and use of std::index_sequence, at the cost of increased complexity.
+Currently, the workarounds for accessing the last elements of a variadic function template usually involves tuple manipulations and use of `std::index_sequence`, at the cost of increased complexity.
 Future proposals on parameter pack indexing may also help alleviate the problems.
 
 We are still however convinced that it would make code cleaner and more uniform to lift the current arbitrary restriction on the function parameter pack position.
