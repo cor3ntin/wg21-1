@@ -1,9 +1,8 @@
 # Setup
-title:            CppLang Slack Code of Conduct
+title:            WG21 proposals
 
 author:
   name:           'Simon Brand'
   url:            https://twitter.com/TartanLlama
 
-github:
-  repo:           https://github.com/TartanLlama/cpplang-code-of-conduct
+  repo:           https://github.com/TartanLlama/wg21
