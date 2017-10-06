@@ -12,7 +12,7 @@ Reply-to: Simon Brand <simonrbrand@gmail.com>
 Abstract
 --------
 
-`std::optional` will be a very important vocabulary type in C++17 and up. Some uses of it can be very verbose and would benefit from operations which allow functional composition. I propose adding `map` and `bind` member functions to `std::optional` to support this monadic style of programming.
+`std::optional` will be a very important vocabulary type in C++17 and up. Some uses of it can be very verbose and would benefit from operations which allow functional composition. I propose adding `map`, `and_then`, and `or_else` member functions to `std::optional` to support this monadic style of programming.
 
 Motivation
 ----------
@@ -75,18 +75,18 @@ If some of those function calls can reasonably not produce a value, then this co
 Proposed solution
 -----------------
 
-This paper proposes adding additional member functions to `std::optional` in order to push the handling of empty states off to the side. The proposed additions are `map` and `bind`. Using these new functions, the code above becomes this:
+This paper proposes adding additional member functions to `std::optional` in order to push the handling of empty states off to the side. The proposed additions are `map`, `and_then` and `or_else`. Using these new functions, the code above becomes this:
 
 ```
 std::optional<int> with_optional_good(int i) {
     auto f = maybe_get_foo(i);
-    auto func = f.bind(maybe_get_func);
-    return f.bind(maybe_get_bar)
+    auto func = f.and_then(maybe_get_func);
+    return f.and_then(maybe_get_bar)
             .map(func);
 }
 ```
 
-We've successfully got rid of all the manual checking; all that we need now is an understanding of what `map` and `bind` do and how to use them.
+We've successfully got rid of all the manual checking; all that we need now is an understanding of what `map` and `and_then` do and how to use them.
 
 #### `map`
 
@@ -119,34 +119,54 @@ The function object *may* return `void`, in which case the returned type will be
 
 If you come from a functional programming or category theory background, you may recognise the first of these as a functor map, and the second as an applicative functor map.
 
-#### `bind`
+#### `and_then`
 
-`bind` is like `map`, but it is used on functions which may not return a value.
+`and_then` is like `map`, but it is used on functions which may not return a value.
 
 For example, say you have `std::optional<std::string>` and a function like `std::stoi` which returns a `std::optional<int>` instead of throwing on failure. Rather than manually checking the optional string before calling, you could do this:
 
 ```
-opt_string.bind(stoi);
+opt_string.and_then(stoi);
 ```
 
-`bind` has two overloads which look roughly like this:
+`and_then` has one overload which looks roughly like this:
 
 ```
 template <class T>
 class optional {
     template <class Return>
-    std::optional<Return> bind (function<std::optional<Return>(T)> func);
-
-    template <class Return>
-    std::optional<Return> bind (function<std::optional<Return>(T)> func, function<void()> error);
+    std::optional<Return> and_then (function<std::optional<Return>(T)> func);
 };
 ```
 
-The first takes any callable object which returns a `std::optional`. If the optional does not have a value stored, then an empty optional is returned. Otherwise, the given function is called with the stored value as an argument, and the return value is returned.
-
-The second overload does the same, but if the execution of `func` returns an empty optional, the `error` function is called before returning. This allows the user to do some logging or throw an exception if they like.
+It takes any callable object which returns a `std::optional`. If the optional does not have a value stored, then an empty optional is returned. Otherwise, the given function is called with the stored value as an argument, and the return value is returned.
 
 Again, those from an FP background will recognise this as a monadic bind.
+
+#### `or_else`
+
+`or_else` returns the optional if it has a value, otherwise it calls a given function. This allows you do things like logging or throwing exceptions in monadic contexts:
+
+```
+get_opt().or_else([]{std::cout << "get_opt failed";});
+get_opt().or_else([]{throw std::runtime_error("get_opt_failed")});
+```
+
+Users can easily abstract these patterns if they are common:
+
+```
+void opt_log(std::string_view msg) {
+     return [=] { std::cout << msg; };
+}
+
+void opt_throw(std::string_view msg) {
+     return [=] { throw std::runtime_error(msg); };
+}
+
+get_opt().or_else(opt_log("get_opt failed"));
+get_opt().or_else(opt_throw("get_opt failed"));
+
+```
 
 #### Chaining
 
@@ -155,88 +175,91 @@ With these two functions, doing a lot of chaining of functions which could fail 
 ```
 std::optional<int> foo() {
     return
-      a().bind(b)
-         .bind(c)
-         .bind(d)
-         .bind(e);
+      a().and_then(b)
+         .and_then(c)
+         .and_then(d)
+         .and_then(e);
 }
 ```
 
 Taking the example of `stoi` from earlier, we could carry out mathematical operations on the result by just adding `map` calls:
 
 ```
-opt_string.bind(stoi)
+opt_string.and_then(stoi)
           .map([](auto i) { return i * 2; });
 ```
 
-We can also do chaining where failures can result in exceptions being thrown:
+We can also intersperse our chain with error checking code:
 
 ```
-return a().bind(b, throw std::runtime_error("b failed"))
-          .bind(c, throw std::runtime_error("c failed"))
-          .bind(d, throw std::runtime_error("d failed"))
-          .bind(e, throw std::runtime_error("e failed"));
-```
-
-This code is equivalent to:
-
-```
-auto ra = a();
-if (!a) return std::nullopt;
-
-auto rb = b(*a);
-if (!b) throw std::runtime_error("b failed");
-
-auto rc = c(*b);
-if (!c) throw std::runtime_error("c failed");
-
-auto rd = d(*c);
-if (!d) throw std::runtime_error("d failed");
-
-auto re = e(*d);
-if (!e) throw std::runtime_error("e failed");
-
-return re;
-```
+opt_string.and_then(stoi)
+          .or_else(opt_throw("stoi failed"))
+          .map([](auto i) { return i * 2; });
+```          
 
 How other languages handle this
 -------------------------------
 
-`std::optional` is known as `Maybe` in Haskell and it provides much the same functionality. `map` is split between `Functor` (`fmap`) and `Applicative` (`<*>`), and `bind` is in `Monad` and named `>>=`.
+`std::optional` is known as `Maybe` in Haskell and it provides much the same functionality. `map` is split between `Functor` (`fmap`) and `Applicative` (`<*>`), and `and_then` is in `Monad` and named `>>=`.
 
-Rust has an `Option` class where the functor part of `map` is called `map`, and `bind` is called `and_then`. It also provides many additional member functions like `or_else` to return the option if it has a value and call a function otherwise.
+Rust has an `Option` class, and uses the same names as are proposed in this paper. It also provides many additional member functions like `or`, `and`, `map_or_else`.
 
 Considerations
 --------------
 
 ### More functions
 
-Rust's [`Option`](https://doc.rust-lang.org/std/option/enum.Option.html) class provides a lot more than `map` and `bind` (`and_then`). If the idea to add `map` and `bind` is received favourably, then we can think about what other additions we may want to make.
+Rust's [`Option`](https://doc.rust-lang.org/std/option/enum.Option.html) class provides a lot more than `map`, `and_then` and `or_else`. If the idea to add these is received favourably, then we can think about what other additions we may want to make.
 
 ### `map` only
 
-It would be possible to merge the `map` and `bind` functions into one single function which detects if the callable argument will return a `std::optional<T>`, and, if so, return a `std:optional<T>` rather than a `std::optional<std::optional<T>>`. However, I think that this conflates the uses of two functions: `map` is for functions which always produce a result, `bind` is for functions which may or may not. Furthermore, the second argument to `bind` does not make sense for `map`.
+It would be possible to merge all of these into a single function which handles all use cases. However, I think this would make the function more difficult to teach and understand.
 
-### `operator|`
+### Operator overloading
 
-If it was decided to have only `map`, then it might be useful to provide `operator|` with the same semantics. This would allow the following use case:
+We could provide operator overloads with the same semantics as the functions. For exaple, `|` could mean `map`, `>=` `and_then`, and `&` `or_else`. Rewriting some of the examples above would give this:
 
 ```
-return a() | b
-           | c
-           | d
-           | e;
+auto f = maybe_get_foo(i);
+auto func = f.and_then(maybe_get_func);
+return f.and_then(maybe_get_bar)
+        .map(func);
+
+auto f = maybe_get_foo(i);
+auto func = f >= maybe_get_func;
+return f >= maybe_get_bar)
+          | map(func);
+```          
+
+```
+a().and_then(b)
+   .and_then(c)
+   .and_then(d)
+   .and_then(e);
+
+a() >= b
+    >= c
+    >= d
+    >= e;
 ```           
 
 ### Alternative names
 
 `map` may confuse users who are more familiar with its use as a data structure, or consider the common array map from other languages to be different from this application. Some other possible names are `then`, `when_value`, `fmap`, `transform`.
 
-`bind` may confuse those more familiar with `std::bind`. An alternative names are `compose`, `chain`, and `and_then`.
+Alternative names for `and_then` are `bind`, `compose`, `chain`.
 
-### `catch_error`
+`or_else` could be named `catch_error`, in line with [P0650r0](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0650r0.pdf)
 
-Instead of overloading `bind` for error handling, a `catch_error` function could be added. Instead of writing `a.bind(b, on_fail)`, you'd write `a.bind(b).catch_error(on_fail)`. 
+### Overloaded `and_then`
+
+Instead of an additional `or_else` function, `and_then` could be overloaded to take an additional error function:
+
+```
+o.and_then(a, []{throw std::runtime_error("oh no");});
+```
+
+The above will throw if `a` returns an empty optional.
 
 
 Pitfalls
@@ -319,25 +342,25 @@ Proposed Wording
 #### New synopsis entry: `[optional.monadic]`, monadic operations
 
 ```
-template <class F> constexpr *see below* bind(F&& f) &;
-template <class F> constexpr *see below* bind(F&& f) &&;
-template <class F> constexpr *see below* bind(F&& f) const&;
-template <class F> constexpr *see below* bind(F&& f) const&&;
-template <class F, class E> constexpr *see below* bind(F&& f, E&& e) &;
-template <class F, class E> constexpr *see below* bind(F&& f, E&& e) &&;
-template <class F, class E> constexpr *see below* bind(F&& f, E&& e) const&;
-template <class F, class E> constexpr *see below* bind(F&& f, E&& e) const&&;
+template <class F> constexpr *see below* and_then(F&& f) &;
+template <class F> constexpr *see below* and_then(F&& f) &&;
+template <class F> constexpr *see below* and_then(F&& f) const&;
+template <class F> constexpr *see below* and_then(F&& f) const&&;
 template <class F> constexpr *see below* map(F&& f) &;
 template <class F> constexpr *see below* map(F&& f) &&;
 template <class F> constexpr *see below* map(F&& f) const&;
 template <class F> constexpr *see below* map(F&& f) const&&;
+template <class F> constexpr optional<T> or_else(F &&f) &;
+template <class F> constexpr optional<T> or_else(F &&f) &&;
+template <class F> constexpr optional<T> or_else(F &&f) const&;
+template <class F> constexpr optional<T> or_else(F &&f) const&&;
 ```
 
 #### New section: Monadic operations `[optional.monadic`]
 
 ```
-template <class F> constexpr *see below* bind(F&& f) &;
-template <class F> constexpr *see below* bind(F&& f) const&;
+template <class F> constexpr *see below* and_then(F&& f) &;
+template <class F> constexpr *see below* and_then(F&& f) const&;
 ```
 
 *Requires*: `std::invoke(std::forward<F>(f), value())` returns a `std::optional<U>` for some `U`.
@@ -347,38 +370,13 @@ template <class F> constexpr *see below* bind(F&& f) const&;
 ---------------------------------------
 
 ```
-template <class F> constexpr *see below* bind(F&& f) &&;
-template <class F> constexpr *see below* bind(F&& f) const&&;
+template <class F> constexpr *see below* and_then(F&& f) &&;
+template <class F> constexpr *see below* and_then(F&& f) const&&;
 ```
 
 *Requires*: `std::invoke(std::forward<F>(f), std::move(value()))` returns a `std::optional<U>` for some `U`.
 
 *Returns*: Let `U` be the result of `std::invoke(std::forward<F>(f), std::move(value()))`. Returns a `std::optional<U>`. The return value is empty if `*this` is empty, otherwise the return value of `std::invoke(std::forward<F>(f), std::move(value()))` is returned.
-
----------------------------------------
-
-```
-template <class F, class E> *see below* bind(F&& f, E&& e) &;
-template <class F, class E> *see below* bind(F&& f, E&& e) const&;
-```
-
-*Requires*: `std::invoke(std::forward<F>(f), value())` returns a `std::optional<U>` for some `U`.
-
-*Returns*: Let `U` be the result of `std::invoke(std::forward<F>(f), value())`. Returns a `std::optional<U>`. The return value is empty if `*this` is empty, otherwise the return value of `std::invoke(std::forward<F>(f), value())` is returned.
-
-*Effects*: If `*this` is not empty and `std::invoke(std::forward<F>(f), value())` returns an empty `std::optional`, then `e` is called with no arguments.
-
----------------------------------------
-
-```
-template <class F, class E> *see below* bind(F&& f, E&& e) &&;
-template <class F, class E> *see below* bind(F&& f, E&& e) const&&;
-```
-*Requires*: `std::invoke(std::forward<F>(f), std::move(value()))` returns a `std::optional<U>` for some `U`.
-
-*Returns*: Let `U` be the result of `std::invoke(std::forward<F>(f), std::move(value()))`. Returns a `std::optional<U>`. The return value is empty if `*this` is empty, otherwise the return value of `std::invoke(std::forward<F>(f), std::move(value()))` is returned.
-
-*Effects*: If `*this` is not empty and `std::invoke(std::forward<F>(f), std::move(value()))` returns an empty `std::optional`, then `e` is called with no arguments.
 
 ---------------------------------------
 
@@ -389,6 +387,8 @@ template <class F> constexpr *see below* map(F&& f) const&;
 
 *Returns*: Let `U` be the result of `std::invoke(std::forward<F>(f), value())`. Returns a `std::optional<U>`. The return value is empty if `*this` is empty, otherwise an `optional<U>` is constructed from the return value of `std::invoke(std::forward<F>(f), value())` and is returned.
 
+---------------------------------------
+
 ```
 template <class F> constexpr *see below* map(F&& f) &&;
 template <class F> constexpr *see below* map(F&& f) const&&;
@@ -397,10 +397,24 @@ template <class F> constexpr *see below* map(F&& f) const&&;
 *Returns*: Let `U` be the result of `std::invoke(std::forward<F>(f), std::move(value()))`. Returns a `std::optional<U>`. The return value is empty if `*this` is empty, otherwise an `optional<U>` is constructed from the return value of `std::invoke(std::forward<F>(f), std::move(value()))` and is returned.
 
 ---------------------------------------
+
+template <class F> constexpr optional<T> or_else(F &&f) &;
+template <class F> constexpr optional<T> or_else(F &&f) const&;
+
+*Effects*: If `*this` has a value, returns `*this`. Otherwise, if `f` returns void, calls `f` and returns `std::nullopt`. Otherwise, returns `f()`;
+
+---------------------------------------
+
+template <class F> constexpr optional<T> or_else(F &&f) &&;
+template <class F> constexpr optional<T> or_else(F &&f) const&&;
+
+*Effects*: If `*this` has a value, returns `std::move(*this)`. Otherwise, if `f` returns void, calls `f` and returns `std::nullopt`. Otherwise, returns `f()`;
+
+---------------------------------------
 ---------------------------------------
 
 Acknowledgements
 ---------------
 
- Thanks to Kenneth Benzie, Vittorio Romeo, Jonathan Müller, Adi Shavit, Nicol Bolas, and Barry Revzin for review and suggestions.
+ Thanks to Kenneth Benzie, Vittorio Romeo, Jonathan Müller, Adi Shavit, Nicol Bolas, Vicente Escribá and Barry Revzin for review and suggestions.
 
