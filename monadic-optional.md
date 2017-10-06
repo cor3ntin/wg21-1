@@ -6,7 +6,7 @@ Monadic operations for `std::optional`
 ======================================
 
 Document number | DXXXr0
-Date            | 2017-10-04
+Date            | 2017-10-06
 Project         | ISO/IEC JTC1 SC22 WG21 Programming Language C++
 Reply-to        | Simon Brand <simonrbrand@gmail.com>
 
