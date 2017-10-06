@@ -127,7 +127,7 @@ If you come from a functional programming or category theory background, you may
 For example, say you have `std::optional<std::string>` and a function like `std::stoi` which returns a `std::optional<int>` instead of throwing on failure. Rather than manually checking the optional string before calling, you could do this:
 
 ```
-opt_string.and_then(stoi);
+auto opt_int = opt_string.and_then(stoi);
 ```
 
 `and_then` has one overload which looks roughly like this:
