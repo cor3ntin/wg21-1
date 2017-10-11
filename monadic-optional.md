@@ -5,7 +5,7 @@ layout: default
 Monadic operations for `std::optional`
 ======================================
 
-Document number | DXXXr0
+Document number | p0798r0
 Date            | 2017-10-06
 Project         | ISO/IEC JTC1 SC22 WG21 Programming Language C++, SG14, LEWG
 Reply-to        | Simon Brand <simon@codeplay.com>
@@ -421,5 +421,5 @@ template <class F> constexpr optional<T> or_else(F &&f) const&&;
 Acknowledgements
 ---------------
 
- Thanks to Kenneth Benzie, Vittorio Romeo, Jonathan Müller, Adi Shavit, Nicol Bolas, Vicente Escribá and Barry Revzin for review and suggestions.
+Thank you to Michael Wong for representing this paper to the committee. Thanks to Kenneth Benzie, Vittorio Romeo, Jonathan Müller, Adi Shavit, Nicol Bolas, Vicente Escribá and Barry Revzin for review and suggestions.
 
