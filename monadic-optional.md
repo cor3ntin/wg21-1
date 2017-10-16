@@ -18,60 +18,63 @@ Abstract
 Motivation
 ----------
 
-`std::optional` aims to be a "vocabulary type", i.e. the canonical type to represent some programming concept. As such, `std::optional` will become widely used to represent an object which may or may not contain a value. Unfortunately, chaining together many computations which may or may not produce a value can be verbose, as empty-checking code will be mixed in with the actual programming logic. Take the following example:
+`std::optional` aims to be a "vocabulary type", i.e. the canonical type to represent some programming concept. As such, `std::optional` will become widely used to represent an object which may or may not contain a value. Unfortunately, chaining together many computations which may or may not produce a value can be verbose, as empty-checking code will be mixed in with the actual programming logic. As an example, the following code automatically extracts cats from images and makes them more cute:
 
 ```
-float get_foo(int i);
-std::string get_bar(float f);
-std::function<int(std::string)> get_func(float f); //std::function use for exposition
-
-int no_optional(int i) {
-    auto f = get_foo(i);
-    auto func = get_func(f);
-    auto s = get_bar(f);
-    return func(s);
-}
-```
-This code is pretty straightforward and concise. But what happens if all of these functions could reasonably not produce a result?
-
-```
-std::optional<float> maybe_get_foo(int i);
-std::optional<std::string> maybe_get_bar(float f);
-std::optional<std::function<int(std::string)>> maybe_get_func(float f);
-
-std::optional<int> with_optional_icky(int i) {
-    auto f = maybe_get_foo(i);
-    if (!f) return std::nullopt;
-
-    auto func = maybe_get_func(*f);
-    if (!func) return std::nullopt;
-
-    auto s = maybe_get_bar(*f);
-    if (!s) return std::nullopt;
-    
-    return func.value()(*s);
+image get_cute_cat (const image& i) {
+    return add_rainbow(
+             make_smaller(
+               make_eyes_sparkle(
+                 add_bow_tie(
+                   crop_to_cat(i))));
 }
 ```
 
-Our code now has a lot of boilerplate to deal with the case where a step fails. Not only does this increase the noise and cognitive load of the function, but if we forget to put in a check, then suddenly we're throwing an exception if we do a bad optional access.
+But there's a problem. What if there's not a cat in the picture? What if there's no good place to add a bow tie? What if it has its back turned and we can't make its eyes sparkle? Some of these operations could fail.
+
+One option would be to throw exceptions on failure. However, there are many code bases which do not use exceptions for a variety of reasons. There's also the possibility that we're going to get *lots* of pictures without cats in them, in which case we'd be using exceptions for control flow. This is commonly seen as bad practice, and has an item warning against it in the [C++ Core Guidelines](https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#e3-use-exceptions-for-error-handling-only).
+
+Another option would be to make those operations which could fail return a `std::optional`:
+
+```
+std::optional<image> get_cute_cat (const image& i) {
+    auto cropped = crop_to_cat(i);
+    if (!cropped) {
+      return std::nullopt;
+    }
+
+    auto with_tie = add_bow_tie(*cropped);
+    if (!with_tie) {
+      return std::nullopt;
+    }
+
+    auto with_sparkles = make_eyes_sparkle(*with_tie);
+    if (!with_sparkles) {
+      return std::nullopt;
+    }
+
+    return add_rainbow(make_smaller(*with_sparkles));
+}
+```
+
+Oh dear. Our code now has a lot of boilerplate to deal with the case where a step fails. Not only does this increase the noise and cognitive load of the function, but if we forget to put in a check, then suddenly we're throwing an exception if we do a bad optional access.
 
 Another possibility would be to call `.value()` on the optionals and let the exception be thrown and caught like so:
 
 ```
-std::optional<int> with_optional_exceptions(int i) {
-   try {
-      auto f = maybe_get_foo(i);
-      auto func = maybe_get_func(f.value());
-      auto s = maybe_get_bar(f.value());
-      return func.value()(s.value());
-   }
-   catch (std::bad_optional_access& e) {
-      return std::nullopt;
-   }
+std::optional<image> get_cute_cat (const image& i) {
+    try {
+        auto cropped = crop_to_cat(i);
+        auto with_tie = add_bow_tie(cropped.value());
+        auto with_sparkles = make_eyes_sparkle(with_tie.value());
+        return add_rainbow(make_smaller(with_sparkles.value()));
+    catch (std::bad_optional_access& e) {
+        return std::nullopt;
+    }    
 }
 ```
 
-If some of those function calls can reasonably not produce a value, then this code is using exceptions for control flow. This is commonly seen as bad practice, and has an item warning against it in the [C++ Core Guidelines](https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#e3-use-exceptions-for-error-handling-only).
+Again, this is using exceptions for control flow. There must be a better way.
 
 Proposed solution
 -----------------
@@ -79,11 +82,12 @@ Proposed solution
 This paper proposes adding additional member functions to `std::optional` in order to push the handling of empty states off to the side. The proposed additions are `map`, `and_then` and `or_else`. Using these new functions, the code above becomes this:
 
 ```
-std::optional<int> with_optional_good(int i) {
-    auto f = maybe_get_foo(i);
-    auto func = f.and_then(maybe_get_func);
-    return f.and_then(maybe_get_bar)
-            .map(func);
+std::optional<image> get_cute_cat (const image& i) {
+    return crop_to_cat(i)
+           .and_then(add_bow_tie)
+           .and_then(make_eyes_sparkle)
+           .map(make_smaller)
+           .map(add_rainbow);
 }
 ```
 
@@ -213,31 +217,24 @@ It would be possible to merge all of these into a single function which handles 
 
 ### Operator overloading
 
-We could provide operator overloads with the same semantics as the functions. For exaple, `|` could mean `map`, `>=` `and_then`, and `&` `or_else`. Rewriting some of the examples above would give this:
+We could provide operator overloads with the same semantics as the functions. For exaple, `|` could mean `map`, `>=` `and_then`, and `&` `or_else`. Rewriting the original example gives this:
 
 ```
-auto f = maybe_get_foo(i);
-auto func = f.and_then(maybe_get_func);
-return f.and_then(maybe_get_bar)
-        .map(func);
+// original
+crop_to_cat(i)
+  .and_then(add_bow_tie)
+  .and_then(make_eyes_sparkle)
+  .map(make_smaller)
+  .map(add_rainbow);
 
-auto f = maybe_get_foo(i);
-auto func = f >= maybe_get_func;
-return f >= maybe_get_bar)
-          | map(func);
+// rewritten
+crop_to_cat(i)
+   >= add_bow_tie
+   >= make_eyes_sparkle
+    | make_smaller
+    | add_rainbow;
+
 ```          
-
-```
-a().and_then(b)
-   .and_then(c)
-   .and_then(d)
-   .and_then(e);
-
-a() >= b
-    >= c
-    >= d
-    >= e;
-```           
 
 ### Applicative Functors
 
