@@ -99,26 +99,21 @@ For example, if you have a `std::optional<std::string>` and you want to get the 
 opt_string.map(&std::string::size);
 ```
 
-`map` has two overloads (in pseudocode for exposition):
+`map` has one overload (in pseudocode for exposition):
 
 ```
 template <class T>
 class optional {
     template <class Return>
     std::optional<Return> map (function<Return(T)> func);
-
-    template <class Return>
-    std::optional<Return> map (std::optional<function<Return(T)>> func);
 };
 ```
 
-The first takes any callable object (like a function). If the `optional` does not have a value stored, then an empty optional is returned. Otherwise, the given function is called with the stored value as an argument, and the return value is returned inside an `optional`.
-
-The second overload takes an optional callable object. If that optional does not have a value stored, then an empty optional is returned. Otherwise, the value is extracted, and used to carry out the same steps as the first overload.
+It takes any callable object (like a function). If the `optional` does not have a value stored, then an empty optional is returned. Otherwise, the given function is called with the stored value as an argument, and the return value is returned inside an `optional`.
 
 The function object *may* return `void`, in which case the returned type will be `std::optional<std::monostate>`.
 
-If you come from a functional programming or category theory background, you may recognise the first of these as a functor map, and the second as an applicative functor map.
+If you come from a functional programming or category theory background, you may recognise this as a functor map.
 
 #### `and_then`
 
@@ -243,6 +238,19 @@ a() >= b
     >= d
     >= e;
 ```           
+
+### Applicative Functors
+
+`map` could be overloaded to accept callables wrapped in `std::optionals`. This fits the **applicative functor** concept. It would look like this:
+
+```
+template <class Return>
+std::optional<Return> map (std::optional<function<Return(T)>> func);
+```
+
+This would give functional programmers the set of operations which they may expect from a monadic-style interface. However, this overload is not particularly useful in C++, as we don't have language support for partial function application, which is one of the main places that this pattern would be used in a language like Haskell.
+
+If use-cases for this come up, then we could add the extra overload.
 
 ### Alternative names
 
@@ -413,7 +421,7 @@ template <class F> constexpr optional<T> or_else(F &&f) &&;
 template <class F> constexpr optional<T> or_else(F &&f) const&&;
 ```
 
-*Effects*: If `*this` has a value, returns `std::move(*this)`. Otherwise, if `f` returns void, calls `f` and returns `std::nullopt`. Otherwise, returns `f()`;
+*Effects*: If `*this` has a value, returns `std::move(*this)`. Otherwise, if `f` returns void, calls `std::forward<F>(f)` and returns `std::nullopt`. Otherwise, returns `std::forward<F>(f)()`;
 
 ---------------------------------------
 ---------------------------------------
