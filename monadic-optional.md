@@ -287,19 +287,19 @@ Users may want to write code like this:
 ```
 std::optional<int> foo(int i) {
     return
-      a().bind(b)
-         .bind(get_func(i));
+      a().and_then(b)
+         .and_then(get_func(i));
 }
 ```
 
 The problem with this is `get_func` will be called regardless of whether `b` returns an empty `std::optional` or not. If it has side effects, then this may not be what the user wants.
 
-One possible solution to this would be to add an additional function, `bind_with` which will take a callable which provides what you want to `bind` to:
+One possible solution to this would be to add an additional function, `bind_with` which will take a callable which provides what you want to bind to:
 
 ```
 std::optional<int> foo(int i) {
     return
-      a().bind(b)
+      a().and_then(b)
          .bind_with([i](){return get_func(i)});
 }
 ```
@@ -420,7 +420,7 @@ template <class F> constexpr optional<T> or_else(F &&f) &;
 template <class F> constexpr optional<T> or_else(F &&f) const&;
 ```
 
-*Requires*: `std::invoke_result_t<F>` must be convertible to `optional<T>`.
+*Requires*: `std::invoke_result_t<F>` must be `void` or convertible to `optional<T>`.
 
 *Effects*: If `*this` has a value, returns `*this`. Otherwise, if `f` returns void, calls `std::forward<F>(f)` and returns `std::nullopt`. Otherwise, returns `std::forward<F>(f)()`;
 
@@ -431,7 +431,7 @@ template <class F> constexpr optional<T> or_else(F &&f) &&;
 template <class F> constexpr optional<T> or_else(F &&f) const&&;
 ```
 
-*Requires*: `std::invoke_result_t<F>` must be convertible to `optional<T>`.
+*Requires*: `std::invoke_result_t<F>` must be `void` or convertible to `optional<T>`.
 
 *Effects*: If `*this` has a value, returns `std::move(*this)`. Otherwise, if `f` returns void, calls `std::forward<F>(f)` and returns `std::nullopt`. Otherwise, returns `std::forward<F>(f)()`;
 
