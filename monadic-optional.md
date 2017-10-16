@@ -176,6 +176,7 @@ class optional {
     template <class Return>
     std::optional<T> or_else (function<Return()> func);
 };
+```
 
 `func` will be called if `*this` is empty. `Return` will either be convertible to `std::optional<T>`, or `void`. In the former case, the return of `func` will be returned from `or_else`; in the second case `std::nullopt` will be returned.
 
