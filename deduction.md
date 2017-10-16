@@ -1,7 +1,3 @@
----
-layout: default
----
-
 Document number | P0478R0
 Date            | 2016-10-16
 Audience        | EWG

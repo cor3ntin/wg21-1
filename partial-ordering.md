@@ -1,7 +1,3 @@
----
-layout: default
----
-
 Amended rules for Partial Ordering of function templates
 ========================================================
 
