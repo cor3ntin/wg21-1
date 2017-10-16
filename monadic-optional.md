@@ -21,12 +21,12 @@ Motivation
 `std::optional` aims to be a "vocabulary type", i.e. the canonical type to represent some programming concept. As such, `std::optional` will become widely used to represent an object which may or may not contain a value. Unfortunately, chaining together many computations which may or may not produce a value can be verbose, as empty-checking code will be mixed in with the actual programming logic. As an example, the following code automatically extracts cats from images and makes them more cute:
 
 ```
-image get_cute_cat (const image& i) {
+image get_cute_cat (const image& img) {
     return add_rainbow(
              make_smaller(
                make_eyes_sparkle(
                  add_bow_tie(
-                   crop_to_cat(i))));
+                   crop_to_cat(img))));
 }
 ```
 
@@ -37,8 +37,8 @@ One option would be to throw exceptions on failure. However, there are many code
 Another option would be to make those operations which could fail return a `std::optional`:
 
 ```
-std::optional<image> get_cute_cat (const image& i) {
-    auto cropped = crop_to_cat(i);
+std::optional<image> get_cute_cat (const image& img) {
+    auto cropped = crop_to_cat(img);
     if (!cropped) {
       return std::nullopt;
     }
@@ -62,9 +62,9 @@ Our code now has a lot of boilerplate to deal with the case where a step fails. 
 Another possibility would be to call `.value()` on the optionals and let the exception be thrown and caught like so:
 
 ```
-std::optional<image> get_cute_cat (const image& i) {
+std::optional<image> get_cute_cat (const image& img) {
     try {
-        auto cropped = crop_to_cat(i);
+        auto cropped = crop_to_cat(img);
         auto with_tie = add_bow_tie(cropped.value());
         auto with_sparkles = make_eyes_sparkle(with_tie.value());
         return add_rainbow(make_smaller(with_sparkles.value()));
@@ -82,8 +82,8 @@ Proposed solution
 This paper proposes adding additional member functions to `std::optional` in order to push the handling of empty states off to the side. The proposed additions are `map`, `and_then` and `or_else`. Using these new functions, the code above becomes this:
 
 ```
-std::optional<image> get_cute_cat (const image& i) {
-    return crop_to_cat(i)
+std::optional<image> get_cute_cat (const image& img) {
+    return crop_to_cat(img)
            .and_then(add_bow_tie)
            .and_then(make_eyes_sparkle)
            .map(make_smaller)
@@ -91,7 +91,7 @@ std::optional<image> get_cute_cat (const image& i) {
 }
 ```
 
-We've successfully got rid of all the manual checking; all that we need now is an understanding of what `map` and `and_then` do and how to use them.
+We've successfully got rid of all the manual checking. We've even improved on the clarity of the non-optional example, which needed to either be read inside-out or split into multiple declarations. All that we need now is an understanding of what `map` and `and_then` do and how to use them.
 
 #### `map`
 
@@ -168,6 +168,17 @@ get_opt().or_else(opt_throw("get_opt failed"));
 
 ```
 
+It has one overload:
+
+```
+template <class T>
+class optional {
+    template <class Return>
+    std::optional<T> or_else (function<Return()> func);
+};
+
+`func` will be called if `*this` is empty. `Return` will either be convertible to `std::optional<T>`, or `void`. In the former case, the return of `func` will be returned from `or_else`; in the second case `std::nullopt` will be returned.
+
 #### Chaining
 
 With these two functions, doing a lot of chaining of functions which could fail becomes very clean:
@@ -185,16 +196,18 @@ std::optional<int> foo() {
 Taking the example of `stoi` from earlier, we could carry out mathematical operations on the result by just adding `map` calls:
 
 ```
-opt_string.and_then(stoi)
-          .map([](auto i) { return i * 2; });
+std::optional<int> i = opt_string
+                       .and_then(stoi)
+                       .map([](auto i) { return i * 2; });
 ```
 
 We can also intersperse our chain with error checking code:
 
 ```
-opt_string.and_then(stoi)
-          .or_else(opt_throw("stoi failed"))
-          .map([](auto i) { return i * 2; });
+std::optional<int> i = opt_string
+                       .and_then(stoi)
+                       .or_else(opt_throw("stoi failed"))
+                       .map([](auto i) { return i * 2; });
 ```          
 
 How other languages handle this
@@ -217,24 +230,24 @@ It would be possible to merge all of these into a single function which handles 
 
 ### Operator overloading
 
-We could provide operator overloads with the same semantics as the functions. For exaple, `|` could mean `map`, `>=` `and_then`, and `&` `or_else`. Rewriting the original example gives this:
+We could provide operator overloads with the same semantics as the functions. For example, `|` could mean `map`, `>=` `and_then`, and `&` `or_else`. Rewriting the original example gives this:
 
 ```
 // original
-crop_to_cat(i)
+crop_to_cat(img)
   .and_then(add_bow_tie)
   .and_then(make_eyes_sparkle)
   .map(make_smaller)
   .map(add_rainbow);
 
 // rewritten
-crop_to_cat(i)
+crop_to_cat(img)
    >= add_bow_tie
    >= make_eyes_sparkle
     | make_smaller
     | add_rainbow;
 
-```          
+```
 
 ### Applicative Functors
 
@@ -245,9 +258,7 @@ template <class Return>
 std::optional<Return> map (std::optional<function<Return(T)>> func);
 ```
 
-This would give functional programmers the set of operations which they may expect from a monadic-style interface. However, this overload is not particularly useful in C++, as we don't have language support for partial function application, which is one of the main places that this pattern would be used in a language like Haskell.
-
-If use-cases for this come up, then we could add the extra overload.
+This would give functional programmers the set of operations which they may expect from a monadic-style interface. However, I couldn't think of many use-cases of this in C++. If some are found then we could add the extra overload.
 
 ### Alternative names
 
@@ -409,7 +420,9 @@ template <class F> constexpr optional<T> or_else(F &&f) &;
 template <class F> constexpr optional<T> or_else(F &&f) const&;
 ```
 
-*Effects*: If `*this` has a value, returns `*this`. Otherwise, if `f` returns void, calls `f` and returns `std::nullopt`. Otherwise, returns `f()`;
+*Requires*: `std::invoke_result_t<F>` must be convertible to `optional<T>`.
+
+*Effects*: If `*this` has a value, returns `*this`. Otherwise, if `f` returns void, calls `std::forward<F>(f)` and returns `std::nullopt`. Otherwise, returns `std::forward<F>(f)()`;
 
 ---------------------------------------
 
@@ -417,6 +430,8 @@ template <class F> constexpr optional<T> or_else(F &&f) const&;
 template <class F> constexpr optional<T> or_else(F &&f) &&;
 template <class F> constexpr optional<T> or_else(F &&f) const&&;
 ```
+
+*Requires*: `std::invoke_result_t<F>` must be convertible to `optional<T>`.
 
 *Effects*: If `*this` has a value, returns `std::move(*this)`. Otherwise, if `f` returns void, calls `std::forward<F>(f)` and returns `std::nullopt`. Otherwise, returns `std::forward<F>(f)()`;
 
