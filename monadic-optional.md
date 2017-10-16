@@ -57,7 +57,7 @@ std::optional<image> get_cute_cat (const image& img) {
 }
 ```
 
-Our code now has a lot of boilerplate to deal with the case where a step fails. Not only does this increase the noise and cognitive load of the function, but if we forget to put in a check, then suddenly we're throwing an exception if we do a bad optional access.
+Our code now has a lot of boilerplate to deal with the case where a step fails. Not only does this increase the noise and cognitive load of the function, but if we forget to put in a check, then suddenly we're down the hole of undefined behaviour if we `*empty_optional`.
 
 Another possibility would be to call `.value()` on the optionals and let the exception be thrown and caught like so:
 
@@ -100,7 +100,15 @@ We've successfully got rid of all the manual checking. We've even improved on th
 For example, if you have a `std::optional<std::string>` and you want to get the size of the string if one is available, you could write this:
 
 ```
-opt_string.map(&std::string::size);
+std::optional<std::size_t> s = opt_string.map(&std::string::size);
+```
+
+which is somewhat equivalent to:
+
+```
+if (opt_string) {
+    std::size_t s = opt_string->size();   
+}
 ```
 
 `map` has one overload (in pseudocode for exposition):
@@ -126,10 +134,18 @@ If you come from a functional programming or category theory background, you may
 For example, say you have `std::optional<std::string>` and a function like `std::stoi` which returns a `std::optional<int>` instead of throwing on failure. Rather than manually checking the optional string before calling, you could do this:
 
 ```
-auto opt_int = opt_string.and_then(stoi);
+std::optional<int> i = opt_string.and_then(stoi);
 ```
 
-`and_then` has one overload which looks roughly like this:
+Which is roughly equivalent to:
+
+```
+if (opt_string) {
+   std::optional<int> i = stoi(*opt_string);
+}
+```
+
+`and_then` has one overload which looks like this:
 
 ```
 template <class T>
@@ -214,7 +230,7 @@ std::optional<int> i = opt_string
 How other languages handle this
 -------------------------------
 
-`std::optional` is known as `Maybe` in Haskell and it provides much the same functionality. `map` is split between `Functor` (`fmap`) and `Applicative` (`<*>`), and `and_then` is in `Monad` and named `>>=`.
+`std::optional` is known as `Maybe` in Haskell and it provides much the same functionality. `map` is in `Functor` and named `fmap`, and `and_then` is in `Monad` and named `>>=` (bind).
 
 Rust has an `Option` class, and uses the same names as are proposed in this paper. It also provides many additional member functions like `or`, `and`, `map_or_else`.
 
@@ -314,23 +330,16 @@ Other solutions
 There is a proposal for adding a [general monadic interface](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0650r0.pdf) to C++. Unfortunately doing the kind of composition described above would be very verbose with the current proposal without some kind of Haskell-style `do` notation. The code for my first solution above would look like this:
 
 ```
-std::optional<int> with_optional_good(int i) {
-    auto f = maybe_get_foo(i);
-    auto func = monad::bind(f, maybe_get_func);
-    return applicative::ap(
-             monad::bind(maybe_get_bar), func);
-}
-```
-
-This is not so bad, but when you start to do some longer chains, the non-member functions start to hurt:
-
-```
-std::optional<int> foo() {
+std::optional<int> get_cute_cat(const image& img) {
     return
-      monad::bind(e,    
-        monad::bind(d,
-          monad::bind(c,
-            monad::bind(a(), b));
+      monad::map(    
+        monad::map(
+          monad::bind(
+            monad::bind(crop_to_cat(img),
+              add_bow_tie),
+            make_eyes_sparkle),
+         make_smaller),
+      add_rainbow);
 }
 ```
 
