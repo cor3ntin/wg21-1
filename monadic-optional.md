@@ -249,6 +249,8 @@ crop_to_cat(img)
 
 ```
 
+Another option would be `>>` for `and_then`. 
+
 ### Applicative Functors
 
 `map` could be overloaded to accept callables wrapped in `std::optionals`. This fits the *applicative functor* concept. It would look like this:
