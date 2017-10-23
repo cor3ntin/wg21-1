@@ -1,22 +1,20 @@
----
-layout: default
----
+<pre class='metadata'>
+Title: Monadic operations for std::optional
+Status: P
+ED: wg21.tartanllama.xyz/monadic-optional
+Shortname: p0798
+Level: 0
+Editor: Simon Brand, simon@codeplay.com
+Abstract: std::optional will be a very important vocabulary type in C++17 and up. Some uses of it can be very verbose and would benefit from operations which allow functional composition. I propose adding map, and_then, and or_else member functions to std::optional to support this monadic style of programming.
+Group: wg21
+Audience: LEWG, SG14
+Markup Shorthands: markdown yes
+Default Highlight: C++
+Line Numbers: yes
+</pre>
 
-Monadic operations for `std::optional`
-======================================
 
-Document number | p0798r0
-Date            | 2017-10-06
-Project         | ISO/IEC JTC1 SC22 WG21 Programming Language C++, SG14, LEWG
-Reply-to        | Simon Brand <simon@codeplay.com>
-
-Abstract
---------
-
-`std::optional` will be a very important vocabulary type in C++17 and up. Some uses of it can be very verbose and would benefit from operations which allow functional composition. I propose adding `map`, `and_then`, and `or_else` member functions to `std::optional` to support this monadic style of programming.
-
-Motivation
-----------
+# Motivation
 
 `std::optional` aims to be a "vocabulary type", i.e. the canonical type to represent some programming concept. As such, `std::optional` will become widely used to represent an object which may or may not contain a value. Unfortunately, chaining together many computations which may or may not produce a value can be verbose, as empty-checking code will be mixed in with the actual programming logic. As an example, the following code automatically extracts cats from images and makes them more cute:
 
@@ -70,14 +68,13 @@ std::optional<image> get_cute_cat (const image& img) {
         return add_rainbow(make_smaller(with_sparkles.value()));
     catch (std::bad_optional_access& e) {
         return std::nullopt;
-    }    
+    }
 }
 ```
 
 Again, this is using exceptions for control flow. There must be a better way.
 
-Proposed solution
------------------
+# Proposed solution
 
 This paper proposes adding additional member functions to `std::optional` in order to push the handling of empty states off to the side. The proposed additions are `map`, `and_then` and `or_else`. Using these new functions, the code above becomes this:
 
@@ -93,7 +90,7 @@ std::optional<image> get_cute_cat (const image& img) {
 
 We've successfully got rid of all the manual checking. We've even improved on the clarity of the non-optional example, which needed to either be read inside-out or split into multiple declarations. All that we need now is an understanding of what `map` and `and_then` do and how to use them.
 
-#### `map`
+## `map`
 
 `map` applies a function to the value stored in the optional and returns the result wrapped in an optional. If there is no stored value, then it returns an empty optional.
 
@@ -107,7 +104,7 @@ which is somewhat equivalent to:
 
 ```
 if (opt_string) {
-    std::size_t s = opt_string->size();   
+    std::size_t s = opt_string->size();
 }
 ```
 
@@ -127,7 +124,7 @@ The function object *may* return `void`, in which case the returned type will be
 
 If you come from a functional programming or category theory background, you may recognise this as a functor map.
 
-#### `and_then`
+## `and_then`
 
 `and_then` is like `map`, but it is used on functions which may not return a value.
 
@@ -159,7 +156,7 @@ It takes any callable object which returns a `std::optional`. If the optional do
 
 Again, those from an FP background will recognise this as a monadic bind.
 
-#### `or_else`
+## `or_else`
 
 `or_else` returns the optional if it has a value, otherwise it calls a given function. This allows you do things like logging or throwing exceptions in monadic contexts:
 
@@ -196,7 +193,7 @@ class optional {
 
 `func` will be called if `*this` is empty. `Return` will either be convertible to `std::optional<T>`, or `void`. In the former case, the return of `func` will be returned from `or_else`; in the second case `std::nullopt` will be returned.
 
-#### Chaining
+## Chaining
 
 With these two functions, doing a lot of chaining of functions which could fail becomes very clean:
 
@@ -225,27 +222,25 @@ std::optional<int> i = opt_string
                        .and_then(stoi)
                        .or_else(opt_throw("stoi failed"))
                        .map([](auto i) { return i * 2; });
-```          
+```
 
-How other languages handle this
--------------------------------
+# How other languages handle this
 
 `std::optional` is known as `Maybe` in Haskell and it provides much the same functionality. `map` is in `Functor` and named `fmap`, and `and_then` is in `Monad` and named `>>=` (bind).
 
 Rust has an `Option` class, and uses the same names as are proposed in this paper. It also provides many additional member functions like `or`, `and`, `map_or_else`.
 
-Considerations
---------------
+# Considerations
 
-### More functions
+## More functions
 
-Rust's [`Option`](https://doc.rust-lang.org/std/option/enum.Option.html) class provides a lot more than `map`, `and_then` and `or_else`. If the idea to add these is received favourably, then we can think about what other additions we may want to make.
+Rust's [Option](https://doc.rust-lang.org/std/option/enum.Option.html) class provides a lot more than `map`, `and_then` and `or_else`. If the idea to add these is received favourably, then we can think about what other additions we may want to make.
 
-### `map` only
+## `map` only
 
 It would be possible to merge all of these into a single function which handles all use cases. However, I think this would make the function more difficult to teach and understand.
 
-### Operator overloading
+## Operator overloading
 
 We could provide operator overloads with the same semantics as the functions. For example, `|` could mean `map`, `>=` `and_then`, and `&` `or_else`. Rewriting the original example gives this:
 
@@ -266,9 +261,9 @@ crop_to_cat(img)
 
 ```
 
-Another option would be `>>` for `and_then`. 
+Another option would be `>>` for `and_then`.
 
-### Applicative Functors
+## Applicative Functors
 
 `map` could be overloaded to accept callables wrapped in `std::optionals`. This fits the *applicative functor* concept. It would look like this:
 
@@ -279,7 +274,7 @@ std::optional<Return> map (std::optional<function<Return(T)>> func);
 
 This would give functional programmers the set of operations which they may expect from a monadic-style interface. However, I couldn't think of many use-cases of this in C++. If some are found then we could add the extra overload.
 
-### Alternative names
+## Alternative names
 
 `map` may confuse users who are more familiar with its use as a data structure, or consider the common array map from other languages to be different from this application. Some other possible names are `then`, `when_value`, `fmap`, `transform`.
 
@@ -287,7 +282,7 @@ Alternative names for `and_then` are `bind`, `compose`, `chain`.
 
 `or_else` could be named `catch_error`, in line with [P0650r0](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0650r0.pdf)
 
-### Overloaded `and_then`
+## Overloaded `and_then`
 
 Instead of an additional `or_else` function, `and_then` could be overloaded to take an additional error function:
 
@@ -298,8 +293,7 @@ o.and_then(a, []{throw std::runtime_error("oh no");});
 The above will throw if `a` returns an empty optional.
 
 
-Pitfalls
---------
+# Pitfalls
 
 Users may want to write code like this:
 
@@ -332,7 +326,7 @@ There is a proposal for adding a [general monadic interface](http://www.open-std
 ```
 std::optional<int> get_cute_cat(const image& img) {
     return
-      monad::map(    
+      monad::map(
         monad::map(
           monad::bind(
             monad::bind(crop_to_cat(img),
@@ -350,25 +344,22 @@ If `do` notation or [unified call syntax](http://www.open-std.org/jtc1/sc22/wg21
 Interaction with other proposals
 --------------------------------
 
-There is a proposal for [`std::expected`](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0323r2.pdf) which would benefit from many of these same ideas. If the idea to add monadic interfaces to standard library classes on a case-by-case basis is chosen rather than a unified non-member function interface, then compatibility between this proposal and the `std::expected` one should be maintained.
+There is a proposal for [std::expected](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0323r2.pdf) which would benefit from many of these same ideas. If the idea to add monadic interfaces to standard library classes on a case-by-case basis is chosen rather than a unified non-member function interface, then compatibility between this proposal and the `std::expected` one should be maintained.
 
 Mapping functions which return `void` is supported, but is a pain to implement since `void` is not a regular type. If the [Regular Void](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0146r1.html) proposal was accepted, implementation would be simpler and the results of the operation would conform to users expectations better (i.e. return `std::optional<void>` instead of `std::optional<std::monostate>`).
 
 Any proposals which make lambdas or overload sets easier to write and pass around will greatly improve this proposal. In particular, proposals for [lift operators](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2013/n3617.htm) and [abbreviated lambdas](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2017/p0573r0.html) would ensure that the clean style is preserved in the face of many anonymous functions and overloads.
 
 
-Implementation experience
--------------------------
+# Implementation experience
 
 This proposal has been implemented [here](https://github.com/TartanLlama/monadic-optional).
 
 ---------------------------------------
----------------------------------------
 
-Proposed Wording
-----------------
+# Proposed Wording
 
-#### New synopsis entry: `[optional.monadic]`, monadic operations
+## New synopsis entry: `[optional.monadic]`, monadic operations
 
 ```
 template <class F> constexpr *see below* and_then(F&& f) &;
@@ -385,7 +376,7 @@ template <class F> constexpr optional<T> or_else(F &&f) const&;
 template <class F> constexpr optional<T> or_else(F &&f) const&&;
 ```
 
-#### New section: Monadic operations `[optional.monadic`]
+## New section: Monadic operations `[optional.monadic`]
 
 ```
 template <class F> constexpr *see below* and_then(F&& f) &;
@@ -396,8 +387,6 @@ template <class F> constexpr *see below* and_then(F&& f) const&;
 
 *Returns*: Let `U` be the result of `std::invoke(std::forward<F>(f), value())`. Returns a `std::optional<U>`. The return value is empty if `*this` is empty, otherwise the return value of `std::invoke(std::forward<F>(f), value())` is returned.
 
----------------------------------------
-
 ```
 template <class F> constexpr *see below* and_then(F&& f) &&;
 template <class F> constexpr *see below* and_then(F&& f) const&&;
@@ -407,8 +396,6 @@ template <class F> constexpr *see below* and_then(F&& f) const&&;
 
 *Returns*: Let `U` be the result of `std::invoke(std::forward<F>(f), std::move(value()))`. Returns a `std::optional<U>`. The return value is empty if `*this` is empty, otherwise the return value of `std::invoke(std::forward<F>(f), std::move(value()))` is returned.
 
----------------------------------------
-
 ```
 template <class F> constexpr *see below* map(F&& f) &;
 template <class F> constexpr *see below* map(F&& f) const&;
@@ -416,16 +403,12 @@ template <class F> constexpr *see below* map(F&& f) const&;
 
 *Returns*: Let `U` be the result of `std::invoke(std::forward<F>(f), value())`. Returns a `std::optional<U>`. The return value is empty if `*this` is empty, otherwise an `optional<U>` is constructed from the return value of `std::invoke(std::forward<F>(f), value())` and is returned.
 
----------------------------------------
-
 ```
 template <class F> constexpr *see below* map(F&& f) &&;
 template <class F> constexpr *see below* map(F&& f) const&&;
 ```
 
 *Returns*: Let `U` be the result of `std::invoke(std::forward<F>(f), std::move(value()))`. Returns a `std::optional<U>`. The return value is empty if `*this` is empty, otherwise an `optional<U>` is constructed from the return value of `std::invoke(std::forward<F>(f), std::move(value()))` and is returned.
-
----------------------------------------
 
 ```
 template <class F> constexpr optional<T> or_else(F &&f) &;
@@ -435,8 +418,6 @@ template <class F> constexpr optional<T> or_else(F &&f) const&;
 *Requires*: `std::invoke_result_t<F>` must be `void` or convertible to `optional<T>`.
 
 *Effects*: If `*this` has a value, returns `*this`. Otherwise, if `f` returns void, calls `std::forward<F>(f)` and returns `std::nullopt`. Otherwise, returns `std::forward<F>(f)()`;
-
----------------------------------------
 
 ```
 template <class F> constexpr optional<T> or_else(F &&f) &&;
@@ -448,10 +429,8 @@ template <class F> constexpr optional<T> or_else(F &&f) const&&;
 *Effects*: If `*this` has a value, returns `std::move(*this)`. Otherwise, if `f` returns void, calls `std::forward<F>(f)` and returns `std::nullopt`. Otherwise, returns `std::forward<F>(f)()`;
 
 ---------------------------------------
----------------------------------------
 
 Acknowledgements
 ---------------
 
 Thank you to Michael Wong for representing this paper to the committee. Thanks to Kenneth Benzie, Vittorio Romeo, Jonathan Müller, Adi Shavit, Nicol Bolas, Vicente Escribá and Barry Revzin for review and suggestions.
-
