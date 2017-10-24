@@ -1,19 +1,22 @@
-Document number | P0478R0
-Date            | 2016-10-16
-Audience        | EWG
-Authors         | Bruno Manganelli <bruno.manga95@gmail.com>
-                | Michael Wong <michael@codeplay.com>
-                | Simon Brand <simonrbrand@gmail.com>
-Reply-to        | Bruno Manganelli <bruno.manga95@gmail.com>
+<pre class='metadata'>
+Title: Template argument deduction for non-terminal function parameter packs
+Status: P
+ED: wg21.tartanllama.xyz/partial-ordering
+Shortname: p0478
+Level: 0
+Editor: Bruno Manganelli, bruno.manga95@gmail.com
+Editor: Simon Brand, simon@codeplay.com
+Editor: Michael Wong, michael@codeplay.com
+Abstract: This proposal aims to add support for non-terminal function parameter pack template argument deduction to the C++ language. There is a companion paper P0485 that amends rules for partial ordering of function templates which enables overload syntax, which resolves CWG1825.
+Group: wg21
+Audience: EWG
+Markup Shorthands: markdown yes
+Default Highlight: C++
+Line Numbers: yes
+Date: 2016-10-16
+</pre>
 
-
-Template argument deduction for non-terminal function parameter packs
-=====================================================================
-
-This proposal aims to add support for non-terminal function parameter pack template argument deduction to the C++ language. There is a companion paper P0485 that amends rules for partial ordering of function templates which enables overload syntax, which resolves CWG1825.
-
-Motivation and scope
---------------------
+# Motivation and scope
 
 Function parameter packs are a great tool for generic programming. However, some of their possible applications are constrained by the fact that packs can undergo template argument deduction only if they appear as the last parameter of the function template parameter list (or if every subsequent parameter has a default argument).
 
@@ -52,8 +55,7 @@ auto alternate_tuple(First first, Middle... middle, Last last)
 }
 ```
 
-Proposal
---------
+# Proposal
 
 We propose that if exactly one function parameter pack is present in a function template for which explicit template arguments are not provided, such parameter pack would only be deduced to correspond to exactly the number of arguments such that the call to the variadic function is valid.
 
@@ -65,18 +67,17 @@ foo(1, 2, 3, 4); // b is deduced as [2, 3]
 
 -End example]
 
-Interaction with the language
------------------------------
+# Interaction with the language
 
-#### Default arguments
+## Default arguments
 
 Currently C++ already supports default arguments before and, according to CWG 1609, after a parameter pack. Nothing would change.
 
-#### Default template arguments
+## Default template arguments
 
 Default template arguments are already allowed after a parameter pack. There would be no semantic difference.
 
-#### Overload resolution
+## Overload resolution
 
 This is dealt with by another proposal on partial ordering and transformed templates (P0485) which resolves CWG 1825, and would easily enable overloading by applying the same proposed rules of replacing the pack in the deduced context with N invented types.
 
@@ -94,22 +95,20 @@ Today `foo(1, 2, 3)` unambiguously calls the first overload. By allowing deducti
 
 However, variadic overloads with non-terminal parameter packs do not seem to be common practice, and believe that the utility of this proposal outweighs this obscure breaking change.
 
-Implementation experience
--------------------------
+# Implementation experience
 
 We have found no particular difficulty with creating an experimental implementation of the proposal, which is available at [https://github.com/bmanga/clang](https://github.com/bmanga/clang).
 
 Standarese Wording available on request.
 
-Alternatives
-------------
+# Alternatives
+
 Currently, the workarounds for accessing the last elements of a variadic function template usually involves tuple manipulations and use of `std::index_sequence`, at the cost of increased complexity.
 Future proposals on parameter pack indexing may also help alleviate the problems.
 
 We are still however convinced that it would make code cleaner and more uniform to lift the current arbitrary restriction on the function parameter pack position.
 
-References
-----------
+# References
 
 CWG 1609: [http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_active.html#1609](http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_active.html#1609)
 
@@ -117,7 +116,6 @@ CWG 1825: [http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_active.html#1825](htt
 
 P0485: Amended rules for Partial Ordering of function templates
 
-Acknowledgement
----------------
+# Acknowledgement
 
 We like to thank Gordon Brown for his review and suggestions.

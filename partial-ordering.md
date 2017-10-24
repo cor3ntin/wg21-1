@@ -1,29 +1,33 @@
-Amended rules for Partial Ordering of function templates
-========================================================
+<pre class='metadata'>
+Title: Amended rules for Partial Ordering of function templates
+Status: P
+ED: wg21.tartanllama.xyz/partial-ordering
+Shortname: p0485
+Level: 0
+Editor: Bruno Manganelli, bruno.manga95@gmail.com
+Editor: Simon Brand, simon@codeplay.com
+Editor: Michael Wong, michael@codeplay.com
+Abstract: This paper aims to modify the definition of a Transformed template (14.5.6.2-3) to better support function parameter packs during partial ordering. It has already reported as CWG 1825. It can support overload resolution for template argument deduction for non-terminal function parameter packs in P0478.
+Group: wg21
+Audience: CWG
+Markup Shorthands: markdown yes
+Default Highlight: C++
+Line Numbers: yes
+Date: 2016-10-16
+</pre>
 
 
-Document number | P0485R0
-Date            | 2016-10-16
-Audience        | CWG
-Authors         | Bruno Manganelli <bruno.manga95@gmail.com>
-                | Michael Wong <michael@codeplay.com>
-                | Simon Brand <simonrbrand@gmail.com>
-Reply-to        | Bruno Manganelli <bruno.manga95@gmail.com>
-
-This paper aims to modify the definition of a Transformed template (14.5.6.2-3) to better support function parameter packs during partial ordering. It has already reported as CWG 1825. It can support overload resolution for template argument deduction for non-terminal function parameter packs in P0478.
-
-Motivation and Scope
---------------------
+# Motivation and Scope
 
 Currently, function parameter packs do not contribute to determining which of two function templates is more specialized than the other.
 
 [Example 1:
 ```
- template <class ...T> int f(T*...)  { return 1; }
-  template <class T>  int f(const T&) { return 2; }
-   void g() {
-       f((int*)0); // Ambiguous, fails in both directions
-        }
+template <class ...T> int f(T*...)  { return 1; }
+template <class T>  int f(const T&) { return 2; }
+void g() {
+  f((int*)0); // Ambiguous, fails in both directions
+}
 ```        
 
 -end example]
@@ -36,8 +40,7 @@ The above call is ambiguous because deduction fails in both directions, with `A`
 This is an unfortunate limitation which has already been pointed out by core issue 1825 (from which the previous example is taken), whose resolution is the base of this proposal.
 
 
-Proposal
---------
+# Proposal
 
 We propose to add an additional step when generating a transformed template for partial ordering involving parameter pack transformations.
 
@@ -53,10 +56,10 @@ For example, in the following code,
 
 ```
 template <class A, class B, class C>
-    void foo(A, B, C); // A
+void foo(A, B, C); // A
 
 template <class A, class... B>
-    void foo(A, B*...); // B
+void foo(A, B*...); // B
 ```
 
 when creating the transformed template for `B` against `A`, the pack substitution would ensure the code behaves as if the declaration of `foo (B)` had the form
@@ -87,20 +90,19 @@ f(1, 2);    // calls #3; non-variadic template #3 is more
 -end example]
 
 
-Implementation experience
--------------------------
+# Implementation experience
 
 The changes have been implemented in clang, as part of a proposal to extend template argument deduction to non-terminal function parameter packs (P0478). [https://github.com/bmanga/clang](https://github.com/bmanga/clang)
 
 Standarese Wording available on request.
 
-Reference
----------
+# Reference
+
 CWG 1825: [http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_active.html#1825](http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_active.html#1825)
 
 P0478: Template argument deduction for non-terminal function parameter packs
 
-Acknowledgement
----------------
+# Acknowledgement
+
 We like to thank Gordon Brown for his review and suggestions.
 
