@@ -1209,7 +1209,7 @@ Possible extra rowspan handling
     </style>
   <meta content="Bikeshed version 0d6a1c7475b7bb2485f411c7e73d9990fd0cfef5" name="generator">
   <link href="wg21.tartanllama.xyz/deducing-this" rel="canonical">
-  <meta content="717b1ff14c96f7cb91f2313ba00c54c277f1aac5" name="document-revision">
+  <meta content="e8c06c94eb757245b56c2bf483927e4ece3d1f81" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1477,10 +1477,7 @@ pre .property::before, pre .property::after {
 <span class="c1"></span><span class="p">};</span>
 </pre>
    <p>Neither the duplication or the delegation via const_cast are arguably great solutions, but they work.</p>
-   <p>
-    In C++11, member functions acquired a new axis to specialize on: ref-qualifiers. Now, instead of potentially needing two overloads of a single member function, we might need four: &amp;, const&amp;, &amp;&amp;, or const&amp;&amp;. We have three approaches to deal with this: we implement the same member four times, we can have three of the overloads delegate to the fourth, or we can have all four delegate to a helper, private static member function. One example might be the overload set for optional
-    <t>::value(). The way to implement it would be something like:</t>
-   </p>
+   <p>In C++11, member functions acquired a new axis to specialize on: ref-qualifiers. Now, instead of potentially needing two overloads of a single member function, we might need four: <code class="highlight"><span class="o">&amp;</span></code>, <code class="highlight"><span class="k">const</span><span class="o">&amp;</span></code>, <code class="highlight"><span class="o">&amp;&amp;</span></code>, or <code class="highlight"><span class="k">const</span><span class="o">&amp;&amp;</span></code>. We have three approaches to deal with this: we implement the same member four times, we can have three of the overloads delegate to the fourth, or we can have all four delegate to a helper, private static member function. One example might be the overload set for <code class="highlight"><span class="n">optional</span><span class="o">&lt;</span><span class="n">T</span><span class="o">>::</span><span class="n">value</span><span class="p">()</span></code>. The way to implement it would be something like:</p>
    <h3 class="heading settled" data-level="1.1" id="quadruplication"><span class="secno">1.1. </span><span class="content">Quadruplication</span><a class="self-link" href="#quadruplication"></a></h3>
 <pre class="highlight"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span>
 <span class="k">class</span> <span class="nc">optional</span> <span class="p">{</span>
