@@ -1176,7 +1176,6 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <link href="https://fonts.googleapis.com/css?family=Inconsolata|PT+Sans" rel="stylesheet">
 <style>
     body {
       font-family: 'PT Sans', sans-serif;
@@ -1184,10 +1183,10 @@ Possible extra rowspan handling
 
     pre, code {
       font-family: 'Inconsolata', monospace;
-      font-size: 1em;
+      font-size: 0.9em;
     }
 
-    code.highlight { 
+    code.highlight {
       padding: 0.2em 0.4em 0.2em 0.4em !important;
     }
 
@@ -1202,10 +1201,15 @@ Possible extra rowspan handling
     code.highlight span.n {
       color: #000000;
     }
-  </style>
+
+    td {
+      background: hsl(24, 20%, 95%);
+      vertical-align: top;
+    }
+    </style>
   <meta content="Bikeshed version 0d6a1c7475b7bb2485f411c7e73d9990fd0cfef5" name="generator">
   <link href="wg21.tartanllama.xyz/deducing-this" rel="canonical">
-  <meta content="fa8c65bdc05fe781690dab2babece48c7130d6a6" name="document-revision">
+  <meta content="717b1ff14c96f7cb91f2313ba00c54c277f1aac5" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1216,6 +1220,93 @@ Possible extra rowspan handling
 [data-md] > :last-child {
     margin-bottom: 0;
 }</style>
+<style>/* style-counters */
+
+body {
+    counter-reset: example figure issue;
+}
+.issue {
+    counter-increment: issue;
+}
+.issue:not(.no-marker)::before {
+    content: "Issue " counter(issue);
+}
+
+.example {
+    counter-increment: example;
+}
+.example:not(.no-marker)::before {
+    content: "Example " counter(example);
+}
+.invalid.example:not(.no-marker)::before,
+.illegal.example:not(.no-marker)::before {
+    content: "Invalid Example" counter(example);
+}
+
+figcaption {
+    counter-increment: figure;
+}
+figcaption:not(.no-marker)::before {
+    content: "Figure " counter(figure) " ";
+}</style>
+<style>/* style-syntax-highlighting */
+
+.highlight:not(.idl) { background: hsl(24, 20%, 95%); }
+code.highlight { padding: .1em; border-radius: .3em; }
+pre.highlight, pre > code.highlight { display: block; padding: 1em; margin: .5em 0; overflow: auto; border-radius: 0; }
+.highlight .c { color: #708090 } /* Comment */
+.highlight .k { color: #990055 } /* Keyword */
+.highlight .l { color: #000000 } /* Literal */
+.highlight .n { color: #0077aa } /* Name */
+.highlight .o { color: #999999 } /* Operator */
+.highlight .p { color: #999999 } /* Punctuation */
+.highlight .cm { color: #708090 } /* Comment.Multiline */
+.highlight .cp { color: #708090 } /* Comment.Preproc */
+.highlight .c1 { color: #708090 } /* Comment.Single */
+.highlight .cs { color: #708090 } /* Comment.Special */
+.highlight .kc { color: #990055 } /* Keyword.Constant */
+.highlight .kd { color: #990055 } /* Keyword.Declaration */
+.highlight .kn { color: #990055 } /* Keyword.Namespace */
+.highlight .kp { color: #990055 } /* Keyword.Pseudo */
+.highlight .kr { color: #990055 } /* Keyword.Reserved */
+.highlight .kt { color: #990055 } /* Keyword.Type */
+.highlight .ld { color: #000000 } /* Literal.Date */
+.highlight .m { color: #000000 } /* Literal.Number */
+.highlight .s { color: #a67f59 } /* Literal.String */
+.highlight .na { color: #0077aa } /* Name.Attribute */
+.highlight .nc { color: #0077aa } /* Name.Class */
+.highlight .no { color: #0077aa } /* Name.Constant */
+.highlight .nd { color: #0077aa } /* Name.Decorator */
+.highlight .ni { color: #0077aa } /* Name.Entity */
+.highlight .ne { color: #0077aa } /* Name.Exception */
+.highlight .nf { color: #0077aa } /* Name.Function */
+.highlight .nl { color: #0077aa } /* Name.Label */
+.highlight .nn { color: #0077aa } /* Name.Namespace */
+.highlight .py { color: #0077aa } /* Name.Property */
+.highlight .nt { color: #669900 } /* Name.Tag */
+.highlight .nv { color: #222222 } /* Name.Variable */
+.highlight .ow { color: #999999 } /* Operator.Word */
+.highlight .mb { color: #000000 } /* Literal.Number.Bin */
+.highlight .mf { color: #000000 } /* Literal.Number.Float */
+.highlight .mh { color: #000000 } /* Literal.Number.Hex */
+.highlight .mi { color: #000000 } /* Literal.Number.Integer */
+.highlight .mo { color: #000000 } /* Literal.Number.Oct */
+.highlight .sb { color: #a67f59 } /* Literal.String.Backtick */
+.highlight .sc { color: #a67f59 } /* Literal.String.Char */
+.highlight .sd { color: #a67f59 } /* Literal.String.Doc */
+.highlight .s2 { color: #a67f59 } /* Literal.String.Double */
+.highlight .se { color: #a67f59 } /* Literal.String.Escape */
+.highlight .sh { color: #a67f59 } /* Literal.String.Heredoc */
+.highlight .si { color: #a67f59 } /* Literal.String.Interpol */
+.highlight .sx { color: #a67f59 } /* Literal.String.Other */
+.highlight .sr { color: #a67f59 } /* Literal.String.Regex */
+.highlight .s1 { color: #a67f59 } /* Literal.String.Single */
+.highlight .ss { color: #a67f59 } /* Literal.String.Symbol */
+.highlight .vc { color: #0077aa } /* Name.Variable.Class */
+.highlight .vg { color: #0077aa } /* Name.Variable.Global */
+.highlight .vi { color: #0077aa } /* Name.Variable.Instance */
+.highlight .il { color: #000000 } /* Literal.Number.Integer.Long */
+</style>
 <style>/* style-selflinks */
 
 .heading, .issue, .note, .example, li, dt {
@@ -1262,61 +1353,6 @@ dfn > a.self-link:hover {
 a.self-link::before            { content: "¶"; }
 .heading > a.self-link::before { content: "§"; }
 dfn > a.self-link::before      { content: "#"; }</style>
-<style>/* style-counters */
-
-body {
-    counter-reset: example figure issue;
-}
-.issue {
-    counter-increment: issue;
-}
-.issue:not(.no-marker)::before {
-    content: "Issue " counter(issue);
-}
-
-.example {
-    counter-increment: example;
-}
-.example:not(.no-marker)::before {
-    content: "Example " counter(example);
-}
-.invalid.example:not(.no-marker)::before,
-.illegal.example:not(.no-marker)::before {
-    content: "Invalid Example" counter(example);
-}
-
-figcaption {
-    counter-increment: figure;
-}
-figcaption:not(.no-marker)::before {
-    content: "Figure " counter(figure) " ";
-}</style>
-<style>/* style-line-numbers */
-
-.line-numbered {
-    display: grid !important;
-    grid-template-columns: min-content 1fr;
-    grid-auto-flow: row;
-}
-.line-no {
-    grid-column: 1;
-    color: gray;
-}
-.line {
-    grid-column: 2;
-}
-.line:hover {
-    background: rgba(0,0,0,.05);
-}
-.line-no[line]::before {
-    padding: 0 .5em 0 .1em;
-    content: attr(line);
-}
-.line-no[line-end]::after {
-    padding: 0 .5em 0 .1em;
-    content: attr(line-end);
-}
-</style>
 <style>/* style-autolinks */
 
 .css.css, .property.property, .descriptor.descriptor {
@@ -1379,64 +1415,6 @@ pre .property::before, pre .property::after {
 [data-link-type=biblio] {
     white-space: pre;
 }</style>
-<style>/* style-syntax-highlighting */
-
-.highlight:not(.idl) { background: hsl(24, 20%, 95%); }
-code.highlight { padding: .1em; border-radius: .3em; }
-pre.highlight, pre > code.highlight { display: block; padding: 1em; margin: .5em 0; overflow: auto; border-radius: 0; }
-.highlight .c { color: #708090 } /* Comment */
-.highlight .k { color: #990055 } /* Keyword */
-.highlight .l { color: #000000 } /* Literal */
-.highlight .n { color: #0077aa } /* Name */
-.highlight .o { color: #999999 } /* Operator */
-.highlight .p { color: #999999 } /* Punctuation */
-.highlight .cm { color: #708090 } /* Comment.Multiline */
-.highlight .cp { color: #708090 } /* Comment.Preproc */
-.highlight .c1 { color: #708090 } /* Comment.Single */
-.highlight .cs { color: #708090 } /* Comment.Special */
-.highlight .kc { color: #990055 } /* Keyword.Constant */
-.highlight .kd { color: #990055 } /* Keyword.Declaration */
-.highlight .kn { color: #990055 } /* Keyword.Namespace */
-.highlight .kp { color: #990055 } /* Keyword.Pseudo */
-.highlight .kr { color: #990055 } /* Keyword.Reserved */
-.highlight .kt { color: #990055 } /* Keyword.Type */
-.highlight .ld { color: #000000 } /* Literal.Date */
-.highlight .m { color: #000000 } /* Literal.Number */
-.highlight .s { color: #a67f59 } /* Literal.String */
-.highlight .na { color: #0077aa } /* Name.Attribute */
-.highlight .nc { color: #0077aa } /* Name.Class */
-.highlight .no { color: #0077aa } /* Name.Constant */
-.highlight .nd { color: #0077aa } /* Name.Decorator */
-.highlight .ni { color: #0077aa } /* Name.Entity */
-.highlight .ne { color: #0077aa } /* Name.Exception */
-.highlight .nf { color: #0077aa } /* Name.Function */
-.highlight .nl { color: #0077aa } /* Name.Label */
-.highlight .nn { color: #0077aa } /* Name.Namespace */
-.highlight .py { color: #0077aa } /* Name.Property */
-.highlight .nt { color: #669900 } /* Name.Tag */
-.highlight .nv { color: #222222 } /* Name.Variable */
-.highlight .ow { color: #999999 } /* Operator.Word */
-.highlight .mb { color: #000000 } /* Literal.Number.Bin */
-.highlight .mf { color: #000000 } /* Literal.Number.Float */
-.highlight .mh { color: #000000 } /* Literal.Number.Hex */
-.highlight .mi { color: #000000 } /* Literal.Number.Integer */
-.highlight .mo { color: #000000 } /* Literal.Number.Oct */
-.highlight .sb { color: #a67f59 } /* Literal.String.Backtick */
-.highlight .sc { color: #a67f59 } /* Literal.String.Char */
-.highlight .sd { color: #a67f59 } /* Literal.String.Doc */
-.highlight .s2 { color: #a67f59 } /* Literal.String.Double */
-.highlight .se { color: #a67f59 } /* Literal.String.Escape */
-.highlight .sh { color: #a67f59 } /* Literal.String.Heredoc */
-.highlight .si { color: #a67f59 } /* Literal.String.Interpol */
-.highlight .sx { color: #a67f59 } /* Literal.String.Other */
-.highlight .sr { color: #a67f59 } /* Literal.String.Regex */
-.highlight .s1 { color: #a67f59 } /* Literal.String.Single */
-.highlight .ss { color: #a67f59 } /* Literal.String.Symbol */
-.highlight .vc { color: #0077aa } /* Name.Variable.Class */
-.highlight .vg { color: #0077aa } /* Name.Variable.Global */
-.highlight .vi { color: #0077aa } /* Name.Variable.Instance */
-.highlight .il { color: #000000 } /* Literal.Number.Integer.Long */
-</style>
  <body class="h-entry">
   <div class="head">
    <p data-fill-with="logo"></p>
@@ -1476,87 +1454,516 @@ pre.highlight, pre > code.highlight { display: block; padding: 1em; margin: .5em
      </ol>
     <li><a href="#proposal"><span class="secno">2</span> <span class="content">Proposal</span></a>
     <li><a href="#alternative-syntax"><span class="secno">3</span> <span class="content">Alternative syntax</span></a>
-    <li>
-     <a href="#examples"><span class="secno">4</span> <span class="content">Examples</span></a>
-     <ol class="toc">
-      <li><a href="#c17"><span class="secno">4.1</span> <span class="content">C++17</span></a>
-      <li><a href="#this-proposal"><span class="secno">4.2</span> <span class="content">This proposal</span></a>
-      <li><a href="#c17①"><span class="secno">4.3</span> <span class="content">C++17</span></a>
-      <li><a href="#this-proposal①"><span class="secno">4.4</span> <span class="content">This proposal</span></a>
-      <li><a href="#c17②"><span class="secno">4.5</span> <span class="content">C++17</span></a>
-      <li><a href="#this-proposal②"><span class="secno">4.6</span> <span class="content">This proposal</span></a>
-      <li><a href="#c17③"><span class="secno">4.7</span> <span class="content">C++17</span></a>
-      <li><a href="#this-proposal③"><span class="secno">4.8</span> <span class="content">This proposal</span></a>
-     </ol>
+    <li><a href="#examples"><span class="secno">4</span> <span class="content">Examples</span></a>
     <li><a href="#sfinae-friendly-callables"><span class="secno">5</span> <span class="content">SFINAE-friendly callables</span></a>
    </ol>
   </nav>
   <main>
    <h2 class="heading settled" data-level="1" id="motivation"><span class="secno">1. </span><span class="content">Motivation</span><a class="self-link" href="#motivation"></a></h2>
    <p>In C++03, member functions could have cv-qualifications, so it was possible to have scenarios where a particular class would want both a <code class="highlight"><span class="k">const</span></code> and non-<code class="highlight"><span class="k">const</span></code> overload of a particular member (Of course it was possible to also want <code class="highlight"><span class="k">volatile</span></code> overloads, but those are less common). In these cases, both overloads do the same thing - the only difference is in the types accessed and used. This was handled by either simply duplicating the function, adjusting types and qualifications as necessary, or having one delegate to the other. An example of the latter can be found in Scott Meyers' "Effective C++", Item 3:</p>
-<pre class="highlight line-numbered"><span class="line-no" line="1"></span><div class="line"><span class="k">class</span> <span class="nc">TextBlock</span> <span class="p">{</span></div><span class="line-no" line="2"></span><div class="line"><span class="k">public</span><span class="o">:</span></div><span class="line-no" line="3"></span><div class="line">    <span class="k">const</span> <span class="kt">char</span><span class="o">&amp;</span> <span class="k">operator</span><span class="p">[](</span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">position</span><span class="p">)</span> <span class="k">const</span> <span class="p">{</span></div><span class="line-no" line="4"></span><div class="line">        <span class="c1">// ...</span></div><span class="line-no" line="5"></span><div class="line"><span class="c1"></span>        <span class="k">return</span> <span class="n">text</span><span class="p">[</span><span class="n">position</span><span class="p">];</span></div><span class="line-no" line="6"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="7"></span><div class="line"> </div><span class="line-no" line="8"></span><div class="line">    <span class="kt">char</span><span class="o">&amp;</span> <span class="k">operator</span><span class="p">[](</span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">position</span><span class="p">)</span> <span class="p">{</span></div><span class="line-no" line="9"></span><div class="line">        <span class="k">return</span> <span class="k">const_cast</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&amp;></span><span class="p">(</span></div><span class="line-no" line="10"></span><div class="line">            <span class="k">static_cast</span><span class="o">&lt;</span><span class="k">const</span> <span class="n">TextBlock</span><span class="o">&amp;></span><span class="p">(</span><span class="k">this</span><span class="p">)[</span><span class="n">position</span><span class="p">]</span></div><span class="line-no" line="11"></span><div class="line">            <span class="p">);</span></div><span class="line-no" line="12"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="13"></span><div class="line">    <span class="c1">// ...</span></div><span class="line-no" line="14"></span><div class="line"><span class="c1"></span><span class="p">};</span></div></pre>
+<pre class="highlight"><span class="k">class</span> <span class="nc">TextBlock</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+  <span class="k">const</span> <span class="kt">char</span><span class="o">&amp;</span> <span class="k">operator</span><span class="p">[](</span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">position</span><span class="p">)</span> <span class="k">const</span> <span class="p">{</span>
+     <span class="c1">// ...</span>
+<span class="c1"></span>    <span class="k">return</span> <span class="n">text</span><span class="p">[</span><span class="n">position</span><span class="p">];</span>
+  <span class="p">}</span>
+
+  <span class="kt">char</span><span class="o">&amp;</span> <span class="k">operator</span><span class="p">[](</span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">position</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">const_cast</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&amp;></span><span class="p">(</span>
+      <span class="k">static_cast</span><span class="o">&lt;</span><span class="k">const</span> <span class="n">TextBlock</span><span class="o">&amp;></span><span class="p">(</span><span class="k">this</span><span class="p">)[</span><span class="n">position</span><span class="p">]</span>
+    <span class="p">);</span>
+  <span class="p">}</span>
+  <span class="c1">// ...</span>
+<span class="c1"></span><span class="p">};</span>
+</pre>
    <p>Neither the duplication or the delegation via const_cast are arguably great solutions, but they work.</p>
    <p>
     In C++11, member functions acquired a new axis to specialize on: ref-qualifiers. Now, instead of potentially needing two overloads of a single member function, we might need four: &amp;, const&amp;, &amp;&amp;, or const&amp;&amp;. We have three approaches to deal with this: we implement the same member four times, we can have three of the overloads delegate to the fourth, or we can have all four delegate to a helper, private static member function. One example might be the overload set for optional
     <t>::value(). The way to implement it would be something like:</t>
    </p>
    <h3 class="heading settled" data-level="1.1" id="quadruplication"><span class="secno">1.1. </span><span class="content">Quadruplication</span><a class="self-link" href="#quadruplication"></a></h3>
-<pre class="highlight line-numbered"><span class="line-no" line="1"></span><div class="line"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span></div><span class="line-no" line="2"></span><div class="line"><span class="k">class</span> <span class="nc">optional</span> <span class="p">{</span></div><span class="line-no" line="3"></span><div class="line">    <span class="c1">// ...</span></div><span class="line-no" line="4"></span><div class="line"><span class="c1"></span>    <span class="k">constexpr</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="o">&amp;</span> <span class="p">{</span></div><span class="line-no" line="5"></span><div class="line">        <span class="k">if</span> <span class="p">(</span><span class="n">has_value</span><span class="p">())</span> <span class="p">{</span></div><span class="line-no" line="6"></span><div class="line">            <span class="k">return</span> <span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">;</span></div><span class="line-no" line="7"></span><div class="line">        <span class="p">}</span></div><span class="line-no" line="8"></span><div class="line">        <span class="k">throw</span> <span class="n">bad_optional_access</span><span class="p">();</span></div><span class="line-no" line="9"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="10"></span><div class="line"> </div><span class="line-no" line="11"></span><div class="line">    <span class="k">constexpr</span> <span class="k">const</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="k">const</span><span class="o">&amp;</span> <span class="p">{</span></div><span class="line-no" line="12"></span><div class="line">        <span class="k">if</span> <span class="p">(</span><span class="n">has_value</span><span class="p">())</span> <span class="p">{</span></div><span class="line-no" line="13"></span><div class="line">            <span class="k">return</span> <span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">;</span></div><span class="line-no" line="14"></span><div class="line">        <span class="p">}</span></div><span class="line-no" line="15"></span><div class="line">        <span class="k">throw</span> <span class="n">bad_optional_access</span><span class="p">();</span></div><span class="line-no" line="16"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="17"></span><div class="line"> </div><span class="line-no" line="18"></span><div class="line">    <span class="k">constexpr</span> <span class="n">T</span><span class="o">&amp;&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="p">{</span></div><span class="line-no" line="19"></span><div class="line">        <span class="k">if</span> <span class="p">(</span><span class="n">has_value</span><span class="p">())</span> <span class="p">{</span></div><span class="line-no" line="20"></span><div class="line">            <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">);</span></div><span class="line-no" line="21"></span><div class="line">        <span class="p">}</span></div><span class="line-no" line="22"></span><div class="line">        <span class="k">throw</span> <span class="n">bad_optional_access</span><span class="p">();</span></div><span class="line-no" line="23"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="24"></span><div class="line"> </div><span class="line-no" line="25"></span><div class="line">    <span class="k">constexpr</span> <span class="k">const</span> <span class="n">T</span><span class="o">&amp;&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="k">const</span><span class="o">&amp;&amp;</span> <span class="p">{</span></div><span class="line-no" line="26"></span><div class="line">        <span class="k">if</span> <span class="p">(</span><span class="n">has_value</span><span class="p">())</span> <span class="p">{</span></div><span class="line-no" line="27"></span><div class="line">            <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">);</span></div><span class="line-no" line="28"></span><div class="line">        <span class="p">}</span></div><span class="line-no" line="29"></span><div class="line">        <span class="k">throw</span> <span class="n">bad_optional_access</span><span class="p">();</span></div><span class="line-no" line="30"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="31"></span><div class="line">    <span class="c1">// ...</span></div><span class="line-no" line="32"></span><div class="line"><span class="c1"></span><span class="p">};</span></div></pre>
+<pre class="highlight"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span>
+<span class="k">class</span> <span class="nc">optional</span> <span class="p">{</span>
+    <span class="c1">// ...</span>
+<span class="c1"></span>    <span class="k">constexpr</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="o">&amp;</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">has_value</span><span class="p">())</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">throw</span> <span class="n">bad_optional_access</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">constexpr</span> <span class="k">const</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="k">const</span><span class="o">&amp;</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">has_value</span><span class="p">())</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">throw</span> <span class="n">bad_optional_access</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">constexpr</span> <span class="n">T</span><span class="o">&amp;&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">has_value</span><span class="p">())</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">throw</span> <span class="n">bad_optional_access</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">constexpr</span> <span class="k">const</span> <span class="n">T</span><span class="o">&amp;&amp;</span>
+    <span class="n">value</span><span class="p">()</span> <span class="k">const</span><span class="o">&amp;&amp;</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">has_value</span><span class="p">())</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">throw</span> <span class="n">bad_optional_access</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="c1">// ...</span>
+<span class="c1"></span><span class="p">};</span>
+</pre>
    <h3 class="heading settled" data-level="1.2" id="delegate-to-4th"><span class="secno">1.2. </span><span class="content">Delegate to 4th</span><a class="self-link" href="#delegate-to-4th"></a></h3>
-<pre class="highlight line-numbered"><span class="line-no" line="1"></span><div class="line"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span></div><span class="line-no" line="2"></span><div class="line"><span class="k">class</span> <span class="nc">optional</span> <span class="p">{</span></div><span class="line-no" line="3"></span><div class="line">    <span class="c1">// ...</span></div><span class="line-no" line="4"></span><div class="line"><span class="c1"></span>    <span class="k">constexpr</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="o">&amp;</span> <span class="p">{</span></div><span class="line-no" line="5"></span><div class="line">        <span class="k">return</span> <span class="k">const_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&amp;></span><span class="p">(</span></div><span class="line-no" line="6"></span><div class="line">            <span class="k">static_cast</span><span class="o">&lt;</span><span class="n">optional</span> <span class="k">const</span><span class="o">&amp;></span><span class="p">(</span></div><span class="line-no" line="7"></span><div class="line">                <span class="o">*</span><span class="k">this</span><span class="p">).</span><span class="n">value</span><span class="p">());</span></div><span class="line-no" line="8"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="9"></span><div class="line"> </div><span class="line-no" line="10"></span><div class="line">    <span class="k">constexpr</span> <span class="k">const</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="k">const</span><span class="o">&amp;</span> <span class="p">{</span></div><span class="line-no" line="11"></span><div class="line">        <span class="k">if</span> <span class="p">(</span><span class="n">has_value</span><span class="p">())</span> <span class="p">{</span></div><span class="line-no" line="12"></span><div class="line">            <span class="k">return</span> <span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">;</span></div><span class="line-no" line="13"></span><div class="line">        <span class="p">}</span></div><span class="line-no" line="14"></span><div class="line">        <span class="k">throw</span> <span class="n">bad_optional_access</span><span class="p">();</span></div><span class="line-no" line="15"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="16"></span><div class="line"> </div><span class="line-no" line="17"></span><div class="line">    <span class="k">constexpr</span> <span class="n">T</span><span class="o">&amp;&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="p">{</span></div><span class="line-no" line="18"></span><div class="line">        <span class="k">return</span> <span class="k">const_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&amp;&amp;></span><span class="p">(</span></div><span class="line-no" line="19"></span><div class="line">            <span class="k">static_cast</span><span class="o">&lt;</span><span class="n">optional</span> <span class="k">const</span><span class="o">&amp;></span><span class="p">(</span></div><span class="line-no" line="20"></span><div class="line">                <span class="o">*</span><span class="k">this</span><span class="p">).</span><span class="n">value</span><span class="p">());</span></div><span class="line-no" line="21"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="22"></span><div class="line"> </div><span class="line-no" line="23"></span><div class="line">    <span class="k">constexpr</span> <span class="k">const</span> <span class="n">T</span><span class="o">&amp;&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="k">const</span><span class="o">&amp;&amp;</span> <span class="p">{</span></div><span class="line-no" line="24"></span><div class="line">        <span class="k">return</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="k">const</span> <span class="n">T</span><span class="o">&amp;&amp;></span><span class="p">(</span></div><span class="line-no" line="25"></span><div class="line">            <span class="n">value</span><span class="p">());</span></div><span class="line-no" line="26"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="27"></span><div class="line">    <span class="c1">// ...</span></div><span class="line-no" line="28"></span><div class="line"><span class="c1"></span><span class="p">};</span></div></pre>
+<pre class="highlight"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span>
+<span class="k">class</span> <span class="nc">optional</span> <span class="p">{</span>
+    <span class="c1">// ...</span>
+<span class="c1"></span>    <span class="k">constexpr</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="o">&amp;</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">const_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&amp;></span><span class="p">(</span>
+            <span class="k">static_cast</span><span class="o">&lt;</span><span class="n">optional</span> <span class="k">const</span><span class="o">&amp;></span><span class="p">(</span>
+                <span class="o">*</span><span class="k">this</span><span class="p">).</span><span class="n">value</span><span class="p">());</span>
+    <span class="p">}</span>
+
+    <span class="k">constexpr</span> <span class="k">const</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="k">const</span><span class="o">&amp;</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">has_value</span><span class="p">())</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">throw</span> <span class="n">bad_optional_access</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">constexpr</span> <span class="n">T</span><span class="o">&amp;&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">const_cast</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&amp;&amp;></span><span class="p">(</span>
+            <span class="k">static_cast</span><span class="o">&lt;</span><span class="n">optional</span> <span class="k">const</span><span class="o">&amp;></span><span class="p">(</span>
+                <span class="o">*</span><span class="k">this</span><span class="p">).</span><span class="n">value</span><span class="p">());</span>
+    <span class="p">}</span>
+
+    <span class="k">constexpr</span> <span class="k">const</span> <span class="n">T</span><span class="o">&amp;&amp;</span>
+    <span class="n">value</span><span class="p">()</span> <span class="k">const</span><span class="o">&amp;&amp;</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="k">const</span> <span class="n">T</span><span class="o">&amp;&amp;></span><span class="p">(</span>
+            <span class="n">value</span><span class="p">());</span>
+    <span class="p">}</span>
+    <span class="c1">// ...</span>
+<span class="c1"></span><span class="p">};</span>
+</pre>
    <h3 class="heading settled" data-level="1.3" id="delegate-to-helper"><span class="secno">1.3. </span><span class="content">Delegate to helper</span><a class="self-link" href="#delegate-to-helper"></a></h3>
-<pre class="highlight line-numbered"><span class="line-no" line="1"></span><div class="line"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span></div><span class="line-no" line="2"></span><div class="line"><span class="k">class</span> <span class="nc">optional</span> <span class="p">{</span></div><span class="line-no" line="3"></span><div class="line">    <span class="c1">// ...</span></div><span class="line-no" line="4"></span><div class="line"><span class="c1"></span>    <span class="k">constexpr</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="o">&amp;</span> <span class="p">{</span></div><span class="line-no" line="5"></span><div class="line">        <span class="k">return</span> <span class="n">value_impl</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">);</span></div><span class="line-no" line="6"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="7"></span><div class="line"> </div><span class="line-no" line="8"></span><div class="line">    <span class="k">constexpr</span> <span class="k">const</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="k">const</span><span class="o">&amp;</span> <span class="p">{</span></div><span class="line-no" line="9"></span><div class="line">        <span class="k">return</span> <span class="n">value_impl</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">);</span></div><span class="line-no" line="10"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="11"></span><div class="line"> </div><span class="line-no" line="12"></span><div class="line">    <span class="k">constexpr</span> <span class="n">T</span><span class="o">&amp;&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="p">{</span></div><span class="line-no" line="13"></span><div class="line">        <span class="k">return</span> <span class="n">value_impl</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">));</span></div><span class="line-no" line="14"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="15"></span><div class="line"> </div><span class="line-no" line="16"></span><div class="line">    <span class="k">constexpr</span> <span class="k">const</span> <span class="n">T</span><span class="o">&amp;&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="k">const</span><span class="o">&amp;&amp;</span> <span class="p">{</span></div><span class="line-no" line="17"></span><div class="line">        <span class="k">return</span> <span class="n">value_impl</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">));</span></div><span class="line-no" line="18"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="19"></span><div class="line"> </div><span class="line-no" line="20"></span><div class="line"><span class="k">private</span><span class="o">:</span></div><span class="line-no" line="21"></span><div class="line">    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">Opt</span><span class="o">></span></div><span class="line-no" line="22"></span><div class="line">    <span class="k">static</span> <span class="k">decltype</span><span class="p">(</span><span class="k">auto</span><span class="p">)</span></div><span class="line-no" line="23"></span><div class="line">    <span class="n">value_impl</span><span class="p">(</span><span class="n">Opt</span><span class="o">&amp;&amp;</span> <span class="n">opt</span><span class="p">)</span> <span class="p">{</span></div><span class="line-no" line="24"></span><div class="line">        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">opt</span><span class="p">.</span><span class="n">has_value</span><span class="p">())</span> <span class="p">{</span></div><span class="line-no" line="25"></span><div class="line">            <span class="k">throw</span> <span class="n">bad_optional_access</span><span class="p">();</span></div><span class="line-no" line="26"></span><div class="line">        <span class="p">}</span></div><span class="line-no" line="27"></span><div class="line">        <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">Opt</span><span class="o">></span><span class="p">(</span><span class="n">opt</span><span class="p">).</span><span class="n">m_value</span><span class="p">;</span></div><span class="line-no" line="28"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="29"></span><div class="line"> </div><span class="line-no" line="30"></span><div class="line"> </div><span class="line-no" line="31"></span><div class="line">    <span class="c1">// ...</span></div><span class="line-no" line="32"></span><div class="line"><span class="c1"></span><span class="p">};</span></div></pre>
+<pre class="highlight"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span>
+<span class="k">class</span> <span class="nc">optional</span> <span class="p">{</span>
+    <span class="c1">// ...</span>
+<span class="c1"></span>    <span class="k">constexpr</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="o">&amp;</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">value_impl</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">constexpr</span> <span class="k">const</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="k">const</span><span class="o">&amp;</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">value_impl</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">constexpr</span> <span class="n">T</span><span class="o">&amp;&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">value_impl</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">));</span>
+    <span class="p">}</span>
+
+    <span class="k">constexpr</span> <span class="k">const</span> <span class="n">T</span><span class="o">&amp;&amp;</span>
+    <span class="n">value</span><span class="p">()</span> <span class="k">const</span><span class="o">&amp;&amp;</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">value_impl</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">));</span>
+    <span class="p">}</span>
+
+<span class="k">private</span><span class="o">:</span>
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">Opt</span><span class="o">></span>
+    <span class="k">static</span> <span class="k">decltype</span><span class="p">(</span><span class="k">auto</span><span class="p">)</span>
+    <span class="n">value_impl</span><span class="p">(</span><span class="n">Opt</span><span class="o">&amp;&amp;</span> <span class="n">opt</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">opt</span><span class="p">.</span><span class="n">has_value</span><span class="p">())</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="n">bad_optional_access</span><span class="p">();</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">Opt</span><span class="o">></span><span class="p">(</span><span class="n">opt</span><span class="p">).</span><span class="n">m_value</span><span class="p">;</span>
+    <span class="p">}</span>
+
+
+    <span class="c1">// ...</span>
+<span class="c1"></span><span class="p">};</span>
+</pre>
    <p>It’s not like this is a complicated function. Far from. But more or less repeating the same code four times, or artificial delgation to avoid doing so, is the kind of thing that begs for a rewrite. Except we can’t really. We _have_ to implement it this way. It seems like we should be able to abstract away the qualifiers. And we can... sort of. As a non-member function, we simply don’t have this problem:</p>
-<pre class="highlight line-numbered"><span class="line-no" line="1"></span><div class="line"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span></div><span class="line-no" line="2"></span><div class="line"><span class="k">class</span> <span class="nc">optional</span> <span class="p">{</span></div><span class="line-no" line="3"></span><div class="line">    <span class="c1">// ...</span></div><span class="line-no" line="4"></span><div class="line"><span class="c1"></span>    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">Opt</span><span class="o">></span></div><span class="line-no" line="5"></span><div class="line">    <span class="k">friend</span> <span class="k">decltype</span><span class="p">(</span><span class="k">auto</span><span class="p">)</span> <span class="n">value</span><span class="p">(</span><span class="n">Opt</span><span class="o">&amp;&amp;</span> <span class="n">o</span><span class="p">)</span> <span class="p">{</span></div><span class="line-no" line="6"></span><div class="line">        <span class="k">if</span> <span class="p">(</span><span class="n">o</span><span class="p">.</span><span class="n">has_value</span><span class="p">())</span> <span class="p">{</span></div><span class="line-no" line="7"></span><div class="line">            <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">Opt</span><span class="o">></span><span class="p">(</span><span class="n">o</span><span class="p">).</span><span class="n">m_value</span><span class="p">;</span></div><span class="line-no" line="8"></span><div class="line">        <span class="p">}</span></div><span class="line-no" line="9"></span><div class="line">        <span class="k">throw</span> <span class="n">bad_optional_access</span><span class="p">();</span></div><span class="line-no" line="10"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="11"></span><div class="line">    <span class="c1">// ...</span></div><span class="line-no" line="12"></span><div class="line"><span class="c1"></span><span class="p">};</span></div></pre>
+<pre class="highlight"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span>
+<span class="k">class</span> <span class="nc">optional</span> <span class="p">{</span>
+    <span class="c1">// ...</span>
+<span class="c1"></span>    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">Opt</span><span class="o">></span>
+    <span class="k">friend</span> <span class="k">decltype</span><span class="p">(</span><span class="k">auto</span><span class="p">)</span> <span class="n">value</span><span class="p">(</span><span class="n">Opt</span><span class="o">&amp;&amp;</span> <span class="n">o</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">o</span><span class="p">.</span><span class="n">has_value</span><span class="p">())</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">Opt</span><span class="o">></span><span class="p">(</span><span class="n">o</span><span class="p">).</span><span class="n">m_value</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">throw</span> <span class="n">bad_optional_access</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="c1">// ...</span>
+<span class="c1"></span><span class="p">};</span>
+</pre>
    <p>This is great - it’s just one function, that handles all four cases for us. Except it’s a non-member function, not a member function. Different semantics, different syntax, doesn’t help.</p>
    <p>There are many, many cases in code-bases where we need two or four overloads of the same member function for different <code class="highlight"><span class="k">const</span></code>- or ref-qualifiers. More than that, there are likely many cases that a class should have four overloads of a particular member function, but doesn’t simply due to laziness by the developer. We think that there are sufficiently many such cases that they merit a better solution than simply: write it, then write it again, then write it two more times.</p>
    <h2 class="heading settled" data-level="2" id="proposal"><span class="secno">2. </span><span class="content">Proposal</span><a class="self-link" href="#proposal"></a></h2>
    <p>This paper proposes a new way of declaring a member function that allows for deducing the type and value category of the instance parameter, while still being invokable as a member function.</p>
    <p>We propose allowing the naming of the first parameter of a cv/ref-unqualified member function <code class="highlight"><span class="k">this</span></code>, which shall be of reference type. The this parameter will be the explicit instance of class type, and can be deduced based on the qualification and value category of the class instance object on which the member function is invoked.</p>
-<pre class="highlight line-numbered"><span class="line-no" line="1"></span><div class="line"><span class="k">struct</span> <span class="n">X</span> <span class="p">{</span></div><span class="line-no" line="2"></span><div class="line">    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="o">></span></div><span class="line-no" line="3"></span><div class="line">    <span class="kt">void</span> <span class="n">foo</span><span class="p">(</span><span class="n">This</span><span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">);</span></div><span class="line-no" line="4"></span><div class="line"> </div><span class="line-no" line="5"></span><div class="line">    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="p">,</span> <span class="k">typename</span> <span class="n">T</span><span class="o">></span></div><span class="line-no" line="6"></span><div class="line">    <span class="kt">void</span> <span class="n">bar</span><span class="p">(</span><span class="n">This</span><span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">,</span> <span class="n">T</span><span class="o">&amp;&amp;</span> <span class="p">);</span></div><span class="line-no" line="7"></span><div class="line"> </div><span class="line-no" line="8"></span><div class="line">    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="o">></span></div><span class="line-no" line="9"></span><div class="line">    <span class="kt">void</span> <span class="n">quux</span><span class="p">(</span><span class="n">This</span><span class="o">&amp;</span> <span class="k">this</span><span class="p">);</span></div><span class="line-no" line="10"></span><div class="line"><span class="p">};</span></div><span class="line-no" line="11"></span><div class="line"> </div><span class="line-no" line="12"></span><div class="line"><span class="kt">void</span> <span class="nf">demo</span><span class="p">(</span><span class="n">X</span> <span class="n">x</span><span class="p">,</span> <span class="k">const</span> <span class="n">X</span><span class="o">*</span> <span class="n">px</span><span class="p">)</span> <span class="p">{</span></div><span class="line-no" line="13"></span><div class="line">    <span class="n">X</span><span class="p">{}.</span><span class="n">foo</span><span class="p">();</span>    <span class="c1">// invokes X::foo&lt;X></span></div><span class="line-no" line="14"></span><div class="line"><span class="c1"></span>    <span class="n">x</span><span class="p">.</span><span class="n">bar</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>     <span class="c1">// invokes X::bar&lt;X&amp;, int></span></div><span class="line-no" line="15"></span><div class="line"><span class="c1"></span>    <span class="n">px</span><span class="o">-></span><span class="n">bar</span><span class="p">(</span><span class="mf">2.0</span><span class="p">);</span> <span class="c1">// invokes X::bar&lt;const X&amp;, double></span></div><span class="line-no" line="16"></span><div class="line"><span class="c1"></span></div><span class="line-no" line="17"></span><div class="line">    <span class="n">X</span><span class="p">{}.</span><span class="n">quux</span><span class="p">();</span>   <span class="c1">// ill-formed</span></div><span class="line-no" line="18"></span><div class="line"><span class="c1"></span>    <span class="n">x</span><span class="p">.</span><span class="n">quux</span><span class="p">();</span>     <span class="c1">// invokes X::quux&lt;X></span></div><span class="line-no" line="19"></span><div class="line"><span class="c1"></span>    <span class="n">px</span><span class="o">-></span><span class="n">quux</span><span class="p">();</span>   <span class="c1">// invokes X::quux&lt;const X></span></div><span class="line-no" line="20"></span><div class="line"><span class="c1"></span><span class="p">}</span></div></pre>
+<pre class="highlight"><span class="k">struct</span> <span class="n">X</span> <span class="p">{</span>
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="o">></span>
+    <span class="kt">void</span> <span class="n">foo</span><span class="p">(</span><span class="n">This</span><span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">);</span>
+
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="p">,</span> <span class="k">typename</span> <span class="n">T</span><span class="o">></span>
+    <span class="kt">void</span> <span class="n">bar</span><span class="p">(</span><span class="n">This</span><span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">,</span> <span class="n">T</span><span class="o">&amp;&amp;</span> <span class="p">);</span>
+
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="o">></span>
+    <span class="kt">void</span> <span class="n">quux</span><span class="p">(</span><span class="n">This</span><span class="o">&amp;</span> <span class="k">this</span><span class="p">);</span>
+<span class="p">};</span>
+
+<span class="kt">void</span> <span class="nf">demo</span><span class="p">(</span><span class="n">X</span> <span class="n">x</span><span class="p">,</span> <span class="k">const</span> <span class="n">X</span><span class="o">*</span> <span class="n">px</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">X</span><span class="p">{}.</span><span class="n">foo</span><span class="p">();</span>    <span class="c1">// invokes X::foo&lt;X></span>
+<span class="c1"></span>    <span class="n">x</span><span class="p">.</span><span class="n">bar</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>     <span class="c1">// invokes X::bar&lt;X&amp;, int></span>
+<span class="c1"></span>    <span class="n">px</span><span class="o">-></span><span class="n">bar</span><span class="p">(</span><span class="mf">2.0</span><span class="p">);</span> <span class="c1">// invokes X::bar&lt;const X&amp;, double></span>
+<span class="c1"></span>
+    <span class="n">X</span><span class="p">{}.</span><span class="n">quux</span><span class="p">();</span>   <span class="c1">// ill-formed</span>
+<span class="c1"></span>    <span class="n">x</span><span class="p">.</span><span class="n">quux</span><span class="p">();</span>     <span class="c1">// invokes X::quux&lt;X></span>
+<span class="c1"></span>    <span class="n">px</span><span class="o">-></span><span class="n">quux</span><span class="p">();</span>   <span class="c1">// invokes X::quux&lt;const X></span>
+<span class="c1"></span><span class="p">}</span>
+</pre>
    <p>The type of this member function would be qualified based on the deduced qualification of the instance parameter. That is, <code class="highlight"><span class="k">decltype</span><span class="p">(</span><span class="o">&amp;</span><span class="n">X</span><span class="o">::</span><span class="n">foo</span><span class="o">&lt;</span><span class="n">X</span><span class="o">></span><span class="p">)</span></code> is <code class="highlight"><span class="kt">void</span> <span class="p">(</span><span class="n">X</span><span class="o">::*</span><span class="p">)()</span> <span class="o">&amp;&amp;</span></code> and <code class="highlight"><span class="k">decltype</span><span class="p">(</span><span class="o">&amp;</span><span class="n">X</span><span class="o">::</span><span class="n">bar</span><span class="o">&lt;</span><span class="k">const</span> <span class="n">X</span><span class="o">&amp;</span><span class="p">,</span> <span class="kt">int</span><span class="o">></span><span class="p">)</span></code> is <code class="highlight"><span class="kt">void</span> <span class="p">(</span><span class="n">X</span><span class="o">::*</span><span class="p">)(</span><span class="kt">int</span><span class="o">&amp;&amp;</span> <span class="p">)</span> <span class="k">const</span><span class="o">&amp;</span></code>. Similarly, <code class="highlight"><span class="k">decltype</span><span class="p">(</span><span class="o">&amp;</span><span class="n">X</span><span class="o">::</span><span class="n">quux</span><span class="o">&lt;</span><span class="n">X</span><span class="o">></span><span class="p">)</span></code> is void <code class="highlight"><span class="p">(</span><span class="n">X</span><span class="o">::*</span><span class="p">)()</span> <span class="o">&amp;</span></code>.</p>
    <p>While the type of <code class="highlight"><span class="k">this</span></code> is deduced, it will always be some qualified form of the class type in which the member function is declared, never a derived type:</p>
-<pre class="highlight line-numbered"><span class="line-no" line="1"></span><div class="line"><span class="k">struct</span> <span class="n">B</span> <span class="p">{</span></div><span class="line-no" line="2"></span><div class="line">    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="o">></span></div><span class="line-no" line="3"></span><div class="line">    <span class="kt">void</span> <span class="n">do_stuff</span><span class="p">(</span><span class="n">This</span><span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">);</span></div><span class="line-no" line="4"></span><div class="line"><span class="p">};</span></div><span class="line-no" line="5"></span><div class="line"> </div><span class="line-no" line="6"></span><div class="line"><span class="k">struct</span> <span class="nl">D</span> <span class="p">:</span> <span class="n">B</span> <span class="p">{</span> <span class="p">};</span></div><span class="line-no" line="7"></span><div class="line"> </div><span class="line-no" line="8"></span><div class="line"><span class="n">D</span> <span class="n">d</span><span class="p">;</span></div><span class="line-no" line="9"></span><div class="line"><span class="n">d</span><span class="p">.</span><span class="n">do_stuff</span><span class="p">();</span>        <span class="c1">// invokes B::do_stuff&lt;B&amp;>, not B::do_stuff&lt;D&amp;></span></div></pre>
+<pre class="highlight"><span class="k">struct</span> <span class="n">B</span> <span class="p">{</span>
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="o">></span>
+    <span class="kt">void</span> <span class="n">do_stuff</span><span class="p">(</span><span class="n">This</span><span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">);</span>
+<span class="p">};</span>
+
+<span class="k">struct</span> <span class="nl">D</span> <span class="p">:</span> <span class="n">B</span> <span class="p">{</span> <span class="p">};</span>
+
+<span class="n">D</span> <span class="n">d</span><span class="p">;</span>
+<span class="n">d</span><span class="p">.</span><span class="n">do_stuff</span><span class="p">();</span>        <span class="c1">// invokes B::do_stuff&lt;B&amp;>, not B::do_stuff&lt;D&amp;></span>
+</pre>
    <p>Within these member functions, the keyword <code class="highlight"><span class="k">this</span></code> will be used as a reference, not as a pointer. While inconsistent with usage in normal member functions, it is more consistent with its declaration as a parameter of reference type, and the difference will be a signal to users that this is a different kind of member function. Hence, accessing members would be done via <code class="highlight"><span class="k">this</span><span class="p">.</span></code> and not <code class="highlight"><span class="k">this</span><span class="o">-></span></code>. Due to these different access rules, all member access must be qualified. There will no longer be an implicit <code class="highlight"><span class="k">this</span></code>:</p>
-<pre class="highlight line-numbered"><span class="line-no" line="1"></span><div class="line"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span></div><span class="line-no" line="2"></span><div class="line"><span class="k">class</span> <span class="nc">Z</span> <span class="p">{</span></div><span class="line-no" line="3"></span><div class="line">    <span class="n">T</span> <span class="n">value</span><span class="p">;</span></div><span class="line-no" line="4"></span><div class="line"><span class="k">public</span><span class="o">:</span></div><span class="line-no" line="5"></span><div class="line">    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">Object</span><span class="o">></span></div><span class="line-no" line="6"></span><div class="line">    <span class="k">decltype</span><span class="p">(</span><span class="k">auto</span><span class="p">)</span> <span class="n">get</span><span class="p">(</span><span class="n">Object</span><span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">)</span> <span class="p">{</span></div><span class="line-no" line="7"></span><div class="line">        <span class="k">return</span> <span class="n">value</span><span class="p">;</span>                            <span class="c1">// error</span></div><span class="line-no" line="8"></span><div class="line"><span class="c1"></span>        <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">></span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="n">value</span><span class="p">;</span> <span class="c1">// ok</span></div><span class="line-no" line="9"></span><div class="line"><span class="c1"></span>    <span class="p">}</span></div><span class="line-no" line="10"></span><div class="line"><span class="p">};</span></div></pre>
+<pre class="highlight"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span>
+<span class="k">class</span> <span class="nc">Z</span> <span class="p">{</span>
+    <span class="n">T</span> <span class="n">value</span><span class="p">;</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">Object</span><span class="o">></span>
+    <span class="k">decltype</span><span class="p">(</span><span class="k">auto</span><span class="p">)</span> <span class="n">get</span><span class="p">(</span><span class="n">Object</span><span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">value</span><span class="p">;</span>                            <span class="c1">// error</span>
+<span class="c1"></span>        <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">></span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="n">value</span><span class="p">;</span> <span class="c1">// ok</span>
+<span class="c1"></span>    <span class="p">}</span>
+<span class="p">};</span>
+</pre>
    <p>While the examples so far all have this as a parameter whose type is deduced, this proposal does not enforce that. We will also allow simply naming the class type as the parameter type, as long as it’s a reference type We do not expect this form to be used, but we likewise do not see the reason to limit the rule.</p>
-<pre class="highlight line-numbered"><span class="line-no" line="1"></span><div class="line"><span class="k">struct</span> <span class="n">A</span> <span class="p">{</span></div><span class="line-no" line="2"></span><div class="line">    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span></div><span class="line-no" line="3"></span><div class="line"> </div><span class="line-no" line="4"></span><div class="line">    <span class="c1">// C++11</span></div><span class="line-no" line="5"></span><div class="line"><span class="c1"></span>    <span class="kt">void</span> <span class="nf">foo</span><span class="p">()</span> <span class="o">&amp;</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">i</span><span class="p">;</span> <span class="p">}</span></div><span class="line-no" line="6"></span><div class="line"> </div><span class="line-no" line="7"></span><div class="line">    <span class="c1">// this proposal: ok, if unlikely to be used</span></div><span class="line-no" line="8"></span><div class="line"><span class="c1"></span>    <span class="kt">void</span> <span class="nf">foo</span><span class="p">(</span><span class="n">A</span><span class="o">&amp;</span> <span class="k">this</span><span class="p">)</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="k">this</span><span class="p">.</span><span class="n">i</span><span class="p">;</span> <span class="p">}</span></div><span class="line-no" line="9"></span><div class="line"> </div><span class="line-no" line="10"></span><div class="line">    <span class="c1">// error: this as a parameter must have reference type</span></div><span class="line-no" line="11"></span><div class="line"><span class="c1"></span>    <span class="kt">void</span> <span class="nf">foo</span><span class="p">(</span><span class="n">A</span><span class="o">*</span> <span class="k">this</span><span class="p">)</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="k">this</span><span class="o">-></span><span class="n">i</span><span class="p">;</span> <span class="p">}</span></div><span class="line-no" line="12"></span><div class="line"><span class="p">};</span></div></pre>
+<pre class="highlight"><span class="k">struct</span> <span class="n">A</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+
+    <span class="c1">// C++11</span>
+<span class="c1"></span>    <span class="kt">void</span> <span class="nf">foo</span><span class="p">()</span> <span class="o">&amp;</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">i</span><span class="p">;</span> <span class="p">}</span>
+
+    <span class="c1">// this proposal: ok, if unlikely to be used</span>
+<span class="c1"></span>    <span class="kt">void</span> <span class="nf">foo</span><span class="p">(</span><span class="n">A</span><span class="o">&amp;</span> <span class="k">this</span><span class="p">)</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="k">this</span><span class="p">.</span><span class="n">i</span><span class="p">;</span> <span class="p">}</span>
+
+    <span class="c1">// error: this as a parameter must have reference type</span>
+<span class="c1"></span>    <span class="kt">void</span> <span class="nf">foo</span><span class="p">(</span><span class="n">A</span><span class="o">*</span> <span class="k">this</span><span class="p">)</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="k">this</span><span class="o">-></span><span class="n">i</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">};</span>
+</pre>
    <p>Since in many ways member functions act as if they accepted an instance of class type as their first parameter (for instance, in <code class="highlight"><span class="n">INVOKE</span></code> and all the functional objects that rely on this), we believe this is a logical extension of the language rules to solve a common and growing source of frustration. This sort of code deduplication is, after all, precisely what templates are for.</p>
    <p>Overload resolution between new-style and old-style member functions would compare the explicit this parameter of the new functions with the implicit this parameter of the old functions:</p>
-<pre class="highlight line-numbered"><span class="line-no" line="1"></span><div class="line"><span class="k">struct</span> <span class="n">C</span> <span class="p">{</span></div><span class="line-no" line="2"></span><div class="line">    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="o">></span></div><span class="line-no" line="3"></span><div class="line">    <span class="kt">void</span> <span class="n">foo</span><span class="p">(</span><span class="n">This</span><span class="o">&amp;</span> <span class="k">this</span><span class="p">);</span> <span class="c1">// #1</span></div><span class="line-no" line="4"></span><div class="line"><span class="c1"></span>    <span class="kt">void</span> <span class="nf">foo</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>     <span class="c1">// #2</span></div><span class="line-no" line="5"></span><div class="line"><span class="c1"></span><span class="p">};</span></div><span class="line-no" line="6"></span><div class="line"> </div><span class="line-no" line="7"></span><div class="line"><span class="kt">void</span> <span class="nf">demo</span><span class="p">(</span><span class="n">C</span><span class="o">*</span> <span class="n">c</span><span class="p">,</span> <span class="n">C</span> <span class="k">const</span><span class="o">*</span> <span class="n">d</span><span class="p">)</span> <span class="p">{</span></div><span class="line-no" line="8"></span><div class="line">    <span class="n">c</span><span class="o">-></span><span class="n">foo</span><span class="p">();</span> <span class="c1">// calls #1, better match</span></div><span class="line-no" line="9"></span><div class="line"><span class="c1"></span>    <span class="n">d</span><span class="o">-></span><span class="n">foo</span><span class="p">();</span> <span class="c1">// calls #2, non-template preferred to template</span></div><span class="line-no" line="10"></span><div class="line"><span class="c1"></span><span class="p">}</span></div></pre>
+<pre class="highlight"><span class="k">struct</span> <span class="n">C</span> <span class="p">{</span>
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="o">></span>
+    <span class="kt">void</span> <span class="n">foo</span><span class="p">(</span><span class="n">This</span><span class="o">&amp;</span> <span class="k">this</span><span class="p">);</span> <span class="c1">// #1</span>
+<span class="c1"></span>    <span class="kt">void</span> <span class="nf">foo</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>     <span class="c1">// #2</span>
+<span class="c1"></span><span class="p">};</span>
+
+<span class="kt">void</span> <span class="nf">demo</span><span class="p">(</span><span class="n">C</span><span class="o">*</span> <span class="n">c</span><span class="p">,</span> <span class="n">C</span> <span class="k">const</span><span class="o">*</span> <span class="n">d</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">c</span><span class="o">-></span><span class="n">foo</span><span class="p">();</span> <span class="c1">// calls #1, better match</span>
+<span class="c1"></span>    <span class="n">d</span><span class="o">-></span><span class="n">foo</span><span class="p">();</span> <span class="c1">// calls #2, non-template preferred to template</span>
+<span class="c1"></span><span class="p">}</span>
+</pre>
    <p>As <code class="highlight"><span class="k">this</span></code> cannot be used as a parameter name today, this proposal is purely a language extension. All current syntax remains valid.</p>
    <h2 class="heading settled" data-level="3" id="alternative-syntax"><span class="secno">3. </span><span class="content">Alternative syntax</span><a class="self-link" href="#alternative-syntax"></a></h2>
    <p>Rather than naming the first parameter <code class="highlight"><span class="k">this</span></code>, we can also consider introducing a dummy template parameter where the qualifications normally reside. This syntax is also ill-formed today, and is purely a language extension:</p>
-<pre class="highlight line-numbered"><span class="line-no" line="1"></span><div class="line"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span></div><span class="line-no" line="2"></span><div class="line"><span class="k">struct</span> <span class="n">X</span> <span class="p">{</span></div><span class="line-no" line="3"></span><div class="line">    <span class="n">T</span> <span class="n">value</span><span class="p">;</span></div><span class="line-no" line="4"></span><div class="line"> </div><span class="line-no" line="5"></span><div class="line">    <span class="c1">// as proposed</span></div><span class="line-no" line="6"></span><div class="line"><span class="c1"></span>    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="o">></span></div><span class="line-no" line="7"></span><div class="line">    <span class="k">decltype</span><span class="p">(</span><span class="k">auto</span><span class="p">)</span> <span class="n">foo</span><span class="p">(</span><span class="n">This</span><span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">)</span> <span class="p">{</span></div><span class="line-no" line="8"></span><div class="line">        <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">This</span><span class="o">></span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="n">value</span><span class="p">;</span></div><span class="line-no" line="9"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="10"></span><div class="line"> </div><span class="line-no" line="11"></span><div class="line">    <span class="c1">// alternative</span></div><span class="line-no" line="12"></span><div class="line"><span class="c1"></span>    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="o">></span></div><span class="line-no" line="13"></span><div class="line">    <span class="k">decltype</span><span class="p">(</span><span class="k">auto</span><span class="p">)</span> <span class="n">foo</span><span class="p">()</span> <span class="n">This</span><span class="o">&amp;&amp;</span> <span class="p">{</span></div><span class="line-no" line="14"></span><div class="line">        <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">This</span><span class="o">></span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">).</span><span class="n">value</span><span class="p">;</span></div><span class="line-no" line="15"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="16"></span><div class="line"><span class="p">};</span></div></pre>
+<pre class="highlight"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span>
+<span class="k">struct</span> <span class="n">X</span> <span class="p">{</span>
+    <span class="n">T</span> <span class="n">value</span><span class="p">;</span>
+
+    <span class="c1">// as proposed</span>
+<span class="c1"></span>    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="o">></span>
+    <span class="k">decltype</span><span class="p">(</span><span class="k">auto</span><span class="p">)</span> <span class="n">foo</span><span class="p">(</span><span class="n">This</span><span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">This</span><span class="o">></span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="n">value</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c1">// alternative</span>
+<span class="c1"></span>    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="o">></span>
+    <span class="k">decltype</span><span class="p">(</span><span class="k">auto</span><span class="p">)</span> <span class="n">foo</span><span class="p">()</span> <span class="n">This</span><span class="o">&amp;&amp;</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">This</span><span class="o">></span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">).</span><span class="n">value</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+</pre>
    <h2 class="heading settled" data-level="4" id="examples"><span class="secno">4. </span><span class="content">Examples</span><a class="self-link" href="#examples"></a></h2>
    <p>This proposal can de-duplicate and de-quadruplicate a large amount of code. In each case, the single function is only slightly more complex than the initial two or four, which makes for a huge win. What follows are a few examples of how repeated code can be reduced.</p>
    <p>The particular implementation of optional is Simon’s, and can be viewed on <a href="https://github.com/TartanLlama/optional">GitHub</a>, and this example includes some functions that are proposed in P0798, with minor changes to better suit this format:</p>
-   <h3 class="heading settled" data-level="4.1" id="c17"><span class="secno">4.1. </span><span class="content">C++17</span><a class="self-link" href="#c17"></a></h3>
-<pre class="highlight line-numbered"><span class="line-no" line="1"></span><div class="line"><span class="k">class</span> <span class="nc">TextBlock</span> <span class="p">{</span></div><span class="line-no" line="2"></span><div class="line"><span class="k">public</span><span class="o">:</span></div><span class="line-no" line="3"></span><div class="line"> </div><span class="line-no" line="4"></span><div class="line">    <span class="k">const</span> <span class="kt">char</span><span class="o">&amp;</span> <span class="k">operator</span><span class="p">[](</span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">position</span><span class="p">)</span> <span class="k">const</span> <span class="p">{</span></div><span class="line-no" line="5"></span><div class="line">        <span class="c1">// ...</span></div><span class="line-no" line="6"></span><div class="line"><span class="c1"></span>        <span class="k">return</span> <span class="n">text</span><span class="p">[</span><span class="n">position</span><span class="p">];</span></div><span class="line-no" line="7"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="8"></span><div class="line"> </div><span class="line-no" line="9"></span><div class="line">    <span class="kt">char</span><span class="o">&amp;</span> <span class="k">operator</span><span class="p">[](</span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">position</span><span class="p">)</span> <span class="p">{</span></div><span class="line-no" line="10"></span><div class="line">        <span class="k">return</span> <span class="k">const_cast</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&amp;></span><span class="p">(</span></div><span class="line-no" line="11"></span><div class="line">            <span class="k">static_cast</span><span class="o">&lt;</span><span class="k">const</span> <span class="n">TextBlock</span><span class="o">&amp;></span><span class="p">(</span><span class="k">this</span><span class="p">)[</span><span class="n">position</span><span class="p">]</span></div><span class="line-no" line="12"></span><div class="line">            <span class="p">);</span></div><span class="line-no" line="13"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="14"></span><div class="line">    <span class="c1">// ...</span></div><span class="line-no" line="15"></span><div class="line"><span class="c1"></span><span class="p">};</span></div></pre>
-   <h3 class="heading settled" data-level="4.2" id="this-proposal"><span class="secno">4.2. </span><span class="content">This proposal</span><a class="self-link" href="#this-proposal"></a></h3>
-<pre class="highlight line-numbered"><span class="line-no" line="1"></span><div class="line"><span class="k">class</span> <span class="nc">TextBlock</span> <span class="p">{</span></div><span class="line-no" line="2"></span><div class="line"><span class="k">public</span><span class="o">:</span></div><span class="line-no" line="3"></span><div class="line">    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="o">></span></div><span class="line-no" line="4"></span><div class="line">    <span class="k">auto</span><span class="o">&amp;</span> <span class="k">operator</span><span class="p">[](</span><span class="n">This</span><span class="o">&amp;</span> <span class="k">this</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">position</span><span class="p">)</span> <span class="p">{</span></div><span class="line-no" line="5"></span><div class="line">        <span class="c1">// ...</span></div><span class="line-no" line="6"></span><div class="line"><span class="c1"></span>        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">text</span><span class="p">[</span><span class="n">position</span><span class="p">];</span></div><span class="line-no" line="7"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="8"></span><div class="line">    <span class="c1">// ...</span></div><span class="line-no" line="9"></span><div class="line"><span class="c1"></span><span class="p">};</span></div></pre>
-   <h3 class="heading settled" data-level="4.3" id="c17①"><span class="secno">4.3. </span><span class="content">C++17</span><a class="self-link" href="#c17①"></a></h3>
-<pre class="highlight line-numbered"><span class="line-no" line="1"></span><div class="line"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span></div><span class="line-no" line="2"></span><div class="line"><span class="k">class</span> <span class="nc">optional</span> <span class="p">{</span></div><span class="line-no" line="3"></span><div class="line">    <span class="c1">// ...</span></div><span class="line-no" line="4"></span><div class="line"><span class="c1"></span>    <span class="k">constexpr</span> <span class="n">T</span><span class="o">*</span> <span class="k">operator</span><span class="o">-></span><span class="p">()</span> <span class="p">{</span></div><span class="line-no" line="5"></span><div class="line">        <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">addressof</span><span class="p">(</span><span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">);</span></div><span class="line-no" line="6"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="7"></span><div class="line"> </div><span class="line-no" line="8"></span><div class="line">    <span class="k">constexpr</span> <span class="k">const</span> <span class="n">T</span><span class="o">*</span> <span class="k">operator</span><span class="o">-></span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span></div><span class="line-no" line="9"></span><div class="line">        <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">addressof</span><span class="p">(</span><span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">);</span></div><span class="line-no" line="10"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="11"></span><div class="line">    <span class="c1">// ...</span></div><span class="line-no" line="12"></span><div class="line"><span class="c1"></span><span class="p">};</span></div></pre>
-   <h3 class="heading settled" data-level="4.4" id="this-proposal①"><span class="secno">4.4. </span><span class="content">This proposal</span><a class="self-link" href="#this-proposal①"></a></h3>
-<pre class="highlight line-numbered"><span class="line-no" line="1"></span><div class="line"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span></div><span class="line-no" line="2"></span><div class="line"><span class="k">class</span> <span class="nc">optional</span> <span class="p">{</span></div><span class="line-no" line="3"></span><div class="line">    <span class="c1">// ...</span></div><span class="line-no" line="4"></span><div class="line"><span class="c1"></span>    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="o">></span></div><span class="line-no" line="5"></span><div class="line">    <span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span><span class="o">-></span><span class="p">(</span><span class="n">This</span><span class="o">&amp;</span> <span class="k">this</span><span class="p">)</span> <span class="p">{</span></div><span class="line-no" line="6"></span><div class="line">        <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">addressof</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">m_value</span><span class="p">);</span></div><span class="line-no" line="7"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="8"></span><div class="line">    <span class="c1">// ...</span></div><span class="line-no" line="9"></span><div class="line"><span class="c1"></span><span class="p">};</span></div></pre>
-   <h3 class="heading settled" data-level="4.5" id="c17②"><span class="secno">4.5. </span><span class="content">C++17</span><a class="self-link" href="#c17②"></a></h3>
-<pre class="highlight line-numbered"><span class="line-no" line="1"></span><div class="line"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span></div><span class="line-no" line="2"></span><div class="line"><span class="k">class</span> <span class="nc">optional</span> <span class="p">{</span></div><span class="line-no" line="3"></span><div class="line">    <span class="c1">// ...</span></div><span class="line-no" line="4"></span><div class="line"><span class="c1"></span>    <span class="k">constexpr</span> <span class="n">T</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">*</span><span class="p">()</span> <span class="o">&amp;</span> <span class="p">{</span></div><span class="line-no" line="5"></span><div class="line">        <span class="k">return</span> <span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">;</span></div><span class="line-no" line="6"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="7"></span><div class="line"> </div><span class="line-no" line="8"></span><div class="line">    <span class="k">constexpr</span> <span class="k">const</span> <span class="n">T</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">*</span><span class="p">()</span> <span class="k">const</span><span class="o">&amp;</span> <span class="p">{</span></div><span class="line-no" line="9"></span><div class="line">        <span class="k">return</span> <span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">;</span></div><span class="line-no" line="10"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="11"></span><div class="line"> </div><span class="line-no" line="12"></span><div class="line">    <span class="k">constexpr</span> <span class="n">T</span><span class="o">&amp;&amp;</span> <span class="k">operator</span><span class="o">*</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="p">{</span></div><span class="line-no" line="13"></span><div class="line">        <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">);</span></div><span class="line-no" line="14"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="15"></span><div class="line"> </div><span class="line-no" line="16"></span><div class="line">    <span class="k">constexpr</span> <span class="k">const</span> <span class="n">T</span><span class="o">&amp;&amp;</span> <span class="k">operator</span><span class="o">*</span><span class="p">()</span> <span class="k">const</span><span class="o">&amp;&amp;</span> <span class="p">{</span></div><span class="line-no" line="17"></span><div class="line">        <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">);</span></div><span class="line-no" line="18"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="19"></span><div class="line"> </div><span class="line-no" line="20"></span><div class="line">    <span class="k">constexpr</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="o">&amp;</span> <span class="p">{</span></div><span class="line-no" line="21"></span><div class="line">        <span class="k">if</span> <span class="p">(</span><span class="n">has_value</span><span class="p">())</span> <span class="p">{</span></div><span class="line-no" line="22"></span><div class="line">            <span class="k">return</span> <span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">;</span></div><span class="line-no" line="23"></span><div class="line">        <span class="p">}</span></div><span class="line-no" line="24"></span><div class="line">        <span class="k">throw</span> <span class="n">bad_optional_access</span><span class="p">();</span></div><span class="line-no" line="25"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="26"></span><div class="line"> </div><span class="line-no" line="27"></span><div class="line">    <span class="k">constexpr</span> <span class="k">const</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="k">const</span><span class="o">&amp;</span> <span class="p">{</span></div><span class="line-no" line="28"></span><div class="line">        <span class="k">if</span> <span class="p">(</span><span class="n">has_value</span><span class="p">())</span> <span class="p">{</span></div><span class="line-no" line="29"></span><div class="line">            <span class="k">return</span> <span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">;</span></div><span class="line-no" line="30"></span><div class="line">        <span class="p">}</span></div><span class="line-no" line="31"></span><div class="line">        <span class="k">throw</span> <span class="n">bad_optional_access</span><span class="p">();</span></div><span class="line-no" line="32"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="33"></span><div class="line"> </div><span class="line-no" line="34"></span><div class="line">    <span class="k">constexpr</span> <span class="n">T</span><span class="o">&amp;&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="p">{</span></div><span class="line-no" line="35"></span><div class="line">        <span class="k">if</span> <span class="p">(</span><span class="n">has_value</span><span class="p">())</span> <span class="p">{</span></div><span class="line-no" line="36"></span><div class="line">            <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">);</span></div><span class="line-no" line="37"></span><div class="line">        <span class="p">}</span></div><span class="line-no" line="38"></span><div class="line">        <span class="k">throw</span> <span class="n">bad_optional_access</span><span class="p">();</span></div><span class="line-no" line="39"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="40"></span><div class="line"> </div><span class="line-no" line="41"></span><div class="line">    <span class="k">constexpr</span> <span class="k">const</span> <span class="n">T</span><span class="o">&amp;&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="k">const</span><span class="o">&amp;&amp;</span> <span class="p">{</span></div><span class="line-no" line="42"></span><div class="line">        <span class="k">if</span> <span class="p">(</span><span class="n">has_value</span><span class="p">())</span> <span class="p">{</span></div><span class="line-no" line="43"></span><div class="line">            <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">);</span></div><span class="line-no" line="44"></span><div class="line">        <span class="p">}</span></div><span class="line-no" line="45"></span><div class="line">        <span class="k">throw</span> <span class="n">bad_optional_access</span><span class="p">();</span></div><span class="line-no" line="46"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="47"></span><div class="line">    <span class="c1">// ...</span></div><span class="line-no" line="48"></span><div class="line"><span class="c1"></span><span class="p">};</span></div></pre>
-   <h3 class="heading settled" data-level="4.6" id="this-proposal②"><span class="secno">4.6. </span><span class="content">This proposal</span><a class="self-link" href="#this-proposal②"></a></h3>
-<pre class="highlight line-numbered"><span class="line-no" line="1"></span><div class="line"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span></div><span class="line-no" line="2"></span><div class="line"><span class="k">class</span> <span class="nc">optional</span> <span class="p">{</span></div><span class="line-no" line="3"></span><div class="line">    <span class="c1">// ...</span></div><span class="line-no" line="4"></span><div class="line"><span class="c1"></span>    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="o">></span></div><span class="line-no" line="5"></span><div class="line">    <span class="k">constexpr</span> <span class="k">auto</span><span class="o">&amp;&amp;</span> <span class="k">operator</span><span class="o">*</span><span class="p">(</span><span class="n">This</span><span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">)</span> <span class="p">{</span></div><span class="line-no" line="6"></span><div class="line">        <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">This</span><span class="o">></span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="n">m_value</span><span class="p">;</span></div><span class="line-no" line="7"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="8"></span><div class="line"> </div><span class="line-no" line="9"></span><div class="line">    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="o">></span></div><span class="line-no" line="10"></span><div class="line">    <span class="k">constexpr</span> <span class="k">auto</span><span class="o">&amp;&amp;</span> <span class="n">value</span><span class="p">(</span><span class="n">This</span><span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">)</span> <span class="p">{</span></div><span class="line-no" line="11"></span><div class="line">        <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">has_value</span><span class="p">())</span> <span class="p">{</span></div><span class="line-no" line="12"></span><div class="line">            <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">This</span><span class="o">></span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="n">m_value</span><span class="p">;</span></div><span class="line-no" line="13"></span><div class="line">        <span class="p">}</span></div><span class="line-no" line="14"></span><div class="line">        <span class="k">throw</span> <span class="n">bad_optional_access</span><span class="p">();</span></div><span class="line-no" line="15"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="16"></span><div class="line">    <span class="c1">// ...</span></div><span class="line-no" line="17"></span><div class="line"><span class="c1"></span><span class="p">};</span></div></pre>
-   <h3 class="heading settled" data-level="4.7" id="c17③"><span class="secno">4.7. </span><span class="content">C++17</span><a class="self-link" href="#c17③"></a></h3>
-<pre class="highlight line-numbered"><span class="line-no" line="1"></span><div class="line"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span></div><span class="line-no" line="2"></span><div class="line"><span class="k">class</span> <span class="nc">optional</span> <span class="p">{</span></div><span class="line-no" line="3"></span><div class="line">    <span class="c1">// ...</span></div><span class="line-no" line="4"></span><div class="line"><span class="c1"></span>    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">F</span><span class="o">></span></div><span class="line-no" line="5"></span><div class="line">    <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">and_then</span><span class="p">(</span><span class="n">F</span><span class="o">&amp;&amp;</span> <span class="n">f</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">{</span></div><span class="line-no" line="6"></span><div class="line">        <span class="k">using</span> <span class="n">result</span> <span class="o">=</span> <span class="n">invoke_result_t</span><span class="o">&lt;</span><span class="n">F</span><span class="p">,</span> <span class="n">T</span><span class="o">&amp;></span><span class="p">;</span></div><span class="line-no" line="7"></span><div class="line">        <span class="k">static_assert</span><span class="p">(</span><span class="n">is_optional</span><span class="o">&lt;</span><span class="n">result</span><span class="o">>::</span><span class="n">value</span><span class="p">,</span></div><span class="line-no" line="8"></span><div class="line">                      <span class="s">"F must return an optional"</span><span class="p">);</span></div><span class="line-no" line="9"></span><div class="line"> </div><span class="line-no" line="10"></span><div class="line">        <span class="k">return</span> <span class="nf">has_value</span><span class="p">()</span></div><span class="line-no" line="11"></span><div class="line">            <span class="o">?</span> <span class="n">invoke</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">F</span><span class="o">></span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="o">**</span><span class="k">this</span><span class="p">)</span></div><span class="line-no" line="12"></span><div class="line">            <span class="o">:</span> <span class="n">nullopt</span><span class="p">;</span></div><span class="line-no" line="13"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="14"></span><div class="line"> </div><span class="line-no" line="15"></span><div class="line">    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">F</span><span class="o">></span></div><span class="line-no" line="16"></span><div class="line">    <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">and_then</span><span class="p">(</span><span class="n">F</span><span class="o">&amp;&amp;</span> <span class="n">f</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">{</span></div><span class="line-no" line="17"></span><div class="line">        <span class="k">using</span> <span class="n">result</span> <span class="o">=</span> <span class="n">invoke_result_t</span><span class="o">&lt;</span><span class="n">F</span><span class="p">,</span> <span class="n">T</span><span class="o">&amp;&amp;></span><span class="p">;</span></div><span class="line-no" line="18"></span><div class="line">        <span class="k">static_assert</span><span class="p">(</span><span class="n">is_optional</span><span class="o">&lt;</span><span class="n">result</span><span class="o">>::</span><span class="n">value</span><span class="p">,</span></div><span class="line-no" line="19"></span><div class="line">                      <span class="s">"F must return an optional"</span><span class="p">);</span></div><span class="line-no" line="20"></span><div class="line"> </div><span class="line-no" line="21"></span><div class="line">        <span class="k">return</span> <span class="nf">has_value</span><span class="p">()</span></div><span class="line-no" line="22"></span><div class="line">            <span class="o">?</span> <span class="n">invoke</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">F</span><span class="o">></span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="o">**</span><span class="k">this</span><span class="p">))</span></div><span class="line-no" line="23"></span><div class="line">            <span class="o">:</span> <span class="n">nullopt</span><span class="p">;</span></div><span class="line-no" line="24"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="25"></span><div class="line"> </div><span class="line-no" line="26"></span><div class="line">    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">F</span><span class="o">></span></div><span class="line-no" line="27"></span><div class="line">    <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">and_then</span><span class="p">(</span><span class="n">F</span><span class="o">&amp;&amp;</span> <span class="n">f</span><span class="p">)</span> <span class="k">const</span><span class="o">&amp;</span> <span class="p">{</span></div><span class="line-no" line="28"></span><div class="line">        <span class="k">using</span> <span class="n">result</span> <span class="o">=</span> <span class="n">invoke_result_t</span><span class="o">&lt;</span><span class="n">F</span><span class="p">,</span> <span class="k">const</span> <span class="n">T</span><span class="o">&amp;></span><span class="p">;</span></div><span class="line-no" line="29"></span><div class="line">        <span class="k">static_assert</span><span class="p">(</span><span class="n">is_optional</span><span class="o">&lt;</span><span class="n">result</span><span class="o">>::</span><span class="n">value</span><span class="p">,</span></div><span class="line-no" line="30"></span><div class="line">                      <span class="s">"F must return an optional"</span><span class="p">);</span></div><span class="line-no" line="31"></span><div class="line"> </div><span class="line-no" line="32"></span><div class="line">        <span class="k">return</span> <span class="nf">has_value</span><span class="p">()</span></div><span class="line-no" line="33"></span><div class="line">            <span class="o">?</span> <span class="n">invoke</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">F</span><span class="o">></span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="o">**</span><span class="k">this</span><span class="p">)</span></div><span class="line-no" line="34"></span><div class="line">            <span class="o">:</span> <span class="n">nullopt</span><span class="p">;</span></div><span class="line-no" line="35"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="36"></span><div class="line"> </div><span class="line-no" line="37"></span><div class="line">    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">F</span><span class="o">></span></div><span class="line-no" line="38"></span><div class="line">    <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">and_then</span><span class="p">(</span><span class="n">F</span><span class="o">&amp;&amp;</span> <span class="n">f</span><span class="p">)</span> <span class="k">const</span><span class="o">&amp;&amp;</span> <span class="p">{</span></div><span class="line-no" line="39"></span><div class="line">        <span class="k">using</span> <span class="n">result</span> <span class="o">=</span> <span class="n">invoke_result_t</span><span class="o">&lt;</span><span class="n">F</span><span class="p">,</span> <span class="k">const</span> <span class="n">T</span><span class="o">&amp;&amp;></span><span class="p">;</span></div><span class="line-no" line="40"></span><div class="line">        <span class="k">static_assert</span><span class="p">(</span><span class="n">is_optional</span><span class="o">&lt;</span><span class="n">result</span><span class="o">>::</span><span class="n">value</span><span class="p">,</span></div><span class="line-no" line="41"></span><div class="line">                      <span class="s">"F must return an optional"</span><span class="p">);</span></div><span class="line-no" line="42"></span><div class="line"> </div><span class="line-no" line="43"></span><div class="line">        <span class="k">return</span> <span class="nf">has_value</span><span class="p">()</span></div><span class="line-no" line="44"></span><div class="line">            <span class="o">?</span> <span class="n">invoke</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">F</span><span class="o">></span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="o">**</span><span class="k">this</span><span class="p">))</span></div><span class="line-no" line="45"></span><div class="line">            <span class="o">:</span> <span class="n">nullopt</span><span class="p">;</span></div><span class="line-no" line="46"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="47"></span><div class="line">    <span class="c1">// ...</span></div><span class="line-no" line="48"></span><div class="line"><span class="c1"></span><span class="p">};</span></div></pre>
-   <h3 class="heading settled" data-level="4.8" id="this-proposal③"><span class="secno">4.8. </span><span class="content">This proposal</span><a class="self-link" href="#this-proposal③"></a></h3>
-<pre class="highlight line-numbered"><span class="line-no" line="1"></span><div class="line"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span></div><span class="line-no" line="2"></span><div class="line"><span class="k">class</span> <span class="nc">optional</span> <span class="p">{</span></div><span class="line-no" line="3"></span><div class="line">    <span class="c1">// ...</span></div><span class="line-no" line="4"></span><div class="line"><span class="c1"></span>    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="p">,</span> <span class="k">typename</span> <span class="n">F</span><span class="o">></span></div><span class="line-no" line="5"></span><div class="line">    <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">and_then</span><span class="p">(</span><span class="n">This</span><span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">,</span> <span class="n">F</span><span class="o">&amp;&amp;</span> <span class="n">f</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">{</span></div><span class="line-no" line="6"></span><div class="line">        <span class="k">using</span> <span class="n">result</span> <span class="o">=</span> <span class="n">invoke_result_t</span><span class="o">&lt;</span><span class="n">F</span><span class="p">,</span> <span class="k">decltype</span><span class="p">((</span></div><span class="line-no" line="7"></span><div class="line">                                                       <span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">This</span><span class="o">></span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="n">m_value</span><span class="p">))</span><span class="o">></span><span class="p">;</span></div><span class="line-no" line="8"></span><div class="line">        <span class="k">static_assert</span><span class="p">(</span><span class="n">is_optional</span><span class="o">&lt;</span><span class="n">result</span><span class="o">>::</span><span class="n">value</span><span class="p">,</span></div><span class="line-no" line="9"></span><div class="line">                      <span class="s">"F must return an optional"</span><span class="p">);</span></div><span class="line-no" line="10"></span><div class="line"> </div><span class="line-no" line="11"></span><div class="line">        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">has_value</span><span class="p">()</span></div><span class="line-no" line="12"></span><div class="line">            <span class="o">?</span> <span class="n">invoke</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">F</span><span class="o">></span><span class="p">(</span><span class="n">f</span><span class="p">),</span></div><span class="line-no" line="13"></span><div class="line">                     <span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">This</span><span class="o">></span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="n">m_value</span><span class="p">)</span></div><span class="line-no" line="14"></span><div class="line">            <span class="o">:</span> <span class="n">nullopt</span><span class="p">;</span></div><span class="line-no" line="15"></span><div class="line">    <span class="p">}</span></div><span class="line-no" line="16"></span><div class="line">    <span class="c1">// ...</span></div><span class="line-no" line="17"></span><div class="line"><span class="c1"></span><span class="p">};</span></div></pre>
+   <table>
+    <tbody>
+     <tr>
+      <th>C++17
+      <th>This proposal
+     <tr>
+      <td>
+<pre class="highlight"><span class="k">class</span> <span class="nc">TextBlock</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+  <span class="k">const</span> <span class="kt">char</span><span class="o">&amp;</span>
+  <span class="k">operator</span><span class="p">[](</span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">position</span><span class="p">)</span> <span class="k">const</span> <span class="p">{</span>
+    <span class="c1">// ...</span>
+<span class="c1"></span>    <span class="k">return</span> <span class="n">text</span><span class="p">[</span><span class="n">position</span><span class="p">];</span>
+  <span class="p">}</span>
+
+  <span class="kt">char</span><span class="o">&amp;</span> <span class="k">operator</span><span class="p">[](</span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">position</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">const_cast</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&amp;></span><span class="p">(</span>
+      <span class="k">static_cast</span><span class="o">&lt;</span><span class="k">const</span> <span class="n">TextBlock</span><span class="o">&amp;></span>
+        <span class="p">(</span><span class="k">this</span><span class="p">)[</span><span class="n">position</span><span class="p">]</span>
+    <span class="p">);</span>
+  <span class="p">}</span>
+  <span class="c1">// ...</span>
+<span class="c1"></span><span class="p">};</span>
+</pre>
+      <td>
+<pre class="highlight"><span class="k">class</span> <span class="nc">TextBlock</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+  <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="o">></span>
+  <span class="k">auto</span><span class="o">&amp;</span> <span class="k">operator</span><span class="p">[](</span><span class="n">This</span><span class="o">&amp;</span> <span class="k">this</span><span class="p">,</span>
+                   <span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">position</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// ...</span>
+<span class="c1"></span>    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">text</span><span class="p">[</span><span class="n">position</span><span class="p">];</span>
+  <span class="p">}</span>
+  <span class="c1">// ...</span>
+<span class="c1"></span><span class="p">};</span>
+</pre>
+     <tr>
+      <td>
+<pre class="highlight"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span>
+<span class="k">class</span> <span class="nc">optional</span> <span class="p">{</span>
+  <span class="c1">// ...</span>
+<span class="c1"></span>  <span class="k">constexpr</span> <span class="n">T</span><span class="o">*</span> <span class="k">operator</span><span class="o">-></span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">addressof</span><span class="p">(</span>
+      <span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="k">constexpr</span> <span class="k">const</span> <span class="n">T</span><span class="o">*</span>
+  <span class="k">operator</span><span class="o">-></span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">addressof</span><span class="p">(</span>
+      <span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="c1">// ...</span>
+<span class="c1"></span><span class="p">};</span>
+</pre>
+      <td>
+<pre class="highlight"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span>
+<span class="k">class</span> <span class="nc">optional</span> <span class="p">{</span>
+  <span class="c1">// ...</span>
+<span class="c1"></span>  <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="o">></span>
+  <span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span><span class="o">-></span><span class="p">(</span><span class="n">This</span><span class="o">&amp;</span> <span class="k">this</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">addressof</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">m_value</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="c1">// ...</span>
+<span class="c1"></span><span class="p">};</span>
+</pre>
+     <tr>
+      <td>
+<pre class="highlight"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span>
+<span class="k">class</span> <span class="nc">optional</span> <span class="p">{</span>
+  <span class="c1">// ...</span>
+<span class="c1"></span>  <span class="k">constexpr</span> <span class="n">T</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">*</span><span class="p">()</span> <span class="o">&amp;</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">constexpr</span> <span class="k">const</span> <span class="n">T</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">*</span><span class="p">()</span> <span class="k">const</span><span class="o">&amp;</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">constexpr</span> <span class="n">T</span><span class="o">&amp;&amp;</span> <span class="k">operator</span><span class="o">*</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="k">constexpr</span> <span class="k">const</span> <span class="n">T</span><span class="o">&amp;&amp;</span>
+  <span class="k">operator</span><span class="o">*</span><span class="p">()</span> <span class="k">const</span><span class="o">&amp;&amp;</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="k">constexpr</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="o">&amp;</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">has_value</span><span class="p">())</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">throw</span> <span class="n">bad_optional_access</span><span class="p">();</span>
+  <span class="p">}</span>
+
+  <span class="k">constexpr</span> <span class="k">const</span> <span class="n">T</span><span class="o">&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="k">const</span><span class="o">&amp;</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">has_value</span><span class="p">())</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">throw</span> <span class="n">bad_optional_access</span><span class="p">();</span>
+  <span class="p">}</span>
+
+  <span class="k">constexpr</span> <span class="n">T</span><span class="o">&amp;&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">has_value</span><span class="p">())</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">throw</span> <span class="n">bad_optional_access</span><span class="p">();</span>
+  <span class="p">}</span>
+
+  <span class="k">constexpr</span> <span class="k">const</span> <span class="n">T</span><span class="o">&amp;&amp;</span> <span class="n">value</span><span class="p">()</span> <span class="k">const</span><span class="o">&amp;&amp;</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">has_value</span><span class="p">())</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">throw</span> <span class="n">bad_optional_access</span><span class="p">();</span>
+  <span class="p">}</span>
+  <span class="c1">// ...</span>
+<span class="c1"></span><span class="p">};</span>
+</pre>
+      <td>
+<pre class="highlight"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span>
+<span class="k">class</span> <span class="nc">optional</span> <span class="p">{</span>
+  <span class="c1">// ...</span>
+<span class="c1"></span>  <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="o">></span>
+  <span class="k">constexpr</span> <span class="k">auto</span><span class="o">&amp;&amp;</span> <span class="k">operator</span><span class="o">*</span><span class="p">(</span><span class="n">This</span><span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">forward</span><span class="o">&lt;</span><span class="n">This</span><span class="o">></span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="n">m_value</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="o">></span>
+  <span class="k">constexpr</span> <span class="k">auto</span><span class="o">&amp;&amp;</span> <span class="n">value</span><span class="p">(</span><span class="n">This</span><span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">has_value</span><span class="p">())</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="n">forward</span><span class="o">&lt;</span><span class="n">This</span><span class="o">></span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="n">m_value</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">throw</span> <span class="n">bad_optional_access</span><span class="p">();</span>
+  <span class="p">}</span>
+  <span class="c1">// ...</span>
+<span class="c1"></span><span class="p">};</span>
+</pre>
+     <tr>
+      <td>
+<pre class="highlight"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span>
+<span class="k">class</span> <span class="nc">optional</span> <span class="p">{</span>
+  <span class="c1">// ...</span>
+<span class="c1"></span>  <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">F</span><span class="o">></span>
+  <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">and_then</span><span class="p">(</span><span class="n">F</span><span class="o">&amp;&amp;</span> <span class="n">f</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">{</span>
+    <span class="k">using</span> <span class="n">result</span> <span class="o">=</span>
+      <span class="n">invoke_result_t</span><span class="o">&lt;</span><span class="n">F</span><span class="p">,</span> <span class="n">T</span><span class="o">&amp;></span><span class="p">;</span>
+    <span class="k">static_assert</span><span class="p">(</span>
+      <span class="n">is_optional</span><span class="o">&lt;</span><span class="n">result</span><span class="o">>::</span><span class="n">value</span><span class="p">,</span>
+      <span class="s">"F must return an optional"</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="nf">has_value</span><span class="p">()</span>
+        <span class="o">?</span> <span class="n">invoke</span><span class="p">(</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">F</span><span class="o">></span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="o">**</span><span class="k">this</span><span class="p">)</span>
+        <span class="o">:</span> <span class="n">nullopt</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">F</span><span class="o">></span>
+  <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">and_then</span><span class="p">(</span><span class="n">F</span><span class="o">&amp;&amp;</span> <span class="n">f</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">{</span>
+    <span class="k">using</span> <span class="n">result</span> <span class="o">=</span>
+      <span class="n">invoke_result_t</span><span class="o">&lt;</span><span class="n">F</span><span class="p">,</span> <span class="n">T</span><span class="o">&amp;&amp;></span><span class="p">;</span>
+    <span class="k">static_assert</span><span class="p">(</span>
+      <span class="n">is_optional</span><span class="o">&lt;</span><span class="n">result</span><span class="o">>::</span><span class="n">value</span><span class="p">,</span>
+      <span class="s">"F must return an optional"</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="nf">has_value</span><span class="p">()</span>
+        <span class="o">?</span> <span class="n">invoke</span><span class="p">(</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">F</span><span class="o">></span><span class="p">(</span><span class="n">f</span><span class="p">),</span>
+                 <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="o">**</span><span class="k">this</span><span class="p">))</span>
+        <span class="o">:</span> <span class="n">nullopt</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">F</span><span class="o">></span>
+  <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">and_then</span><span class="p">(</span><span class="n">F</span><span class="o">&amp;&amp;</span> <span class="n">f</span><span class="p">)</span> <span class="k">const</span><span class="o">&amp;</span> <span class="p">{</span>
+    <span class="k">using</span> <span class="n">result</span> <span class="o">=</span>
+      <span class="n">invoke_result_t</span><span class="o">&lt;</span><span class="n">F</span><span class="p">,</span> <span class="k">const</span> <span class="n">T</span><span class="o">&amp;></span><span class="p">;</span>
+    <span class="k">static_assert</span><span class="p">(</span>
+      <span class="n">is_optional</span><span class="o">&lt;</span><span class="n">result</span><span class="o">>::</span><span class="n">value</span><span class="p">,</span>
+      <span class="s">"F must return an optional"</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="nf">has_value</span><span class="p">()</span>
+        <span class="o">?</span> <span class="n">invoke</span><span class="p">(</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">F</span><span class="o">></span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="o">**</span><span class="k">this</span><span class="p">)</span>
+        <span class="o">:</span> <span class="n">nullopt</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">F</span><span class="o">></span>
+  <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">and_then</span><span class="p">(</span><span class="n">F</span><span class="o">&amp;&amp;</span> <span class="n">f</span><span class="p">)</span> <span class="k">const</span><span class="o">&amp;&amp;</span> <span class="p">{</span>
+    <span class="k">using</span> <span class="n">result</span> <span class="o">=</span>
+      <span class="n">invoke_result_t</span><span class="o">&lt;</span><span class="n">F</span><span class="p">,</span> <span class="k">const</span> <span class="n">T</span><span class="o">&amp;&amp;></span><span class="p">;</span>
+    <span class="k">static_assert</span><span class="p">(</span>
+      <span class="n">is_optional</span><span class="o">&lt;</span><span class="n">result</span><span class="o">>::</span><span class="n">value</span><span class="p">,</span>
+      <span class="s">"F must return an optional"</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="nf">has_value</span><span class="p">()</span>
+        <span class="o">?</span> <span class="n">invoke</span><span class="p">(</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">F</span><span class="o">></span><span class="p">(</span><span class="n">f</span><span class="p">),</span>
+                 <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="o">**</span><span class="k">this</span><span class="p">))</span>
+        <span class="o">:</span> <span class="n">nullopt</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="c1">// ...</span>
+<span class="c1"></span><span class="p">};</span>
+</pre>
+      <td>
+<pre class="highlight"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span>
+<span class="k">class</span> <span class="nc">optional</span> <span class="p">{</span>
+  <span class="c1">// ...</span>
+<span class="c1"></span>  <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="p">,</span> <span class="k">typename</span> <span class="n">F</span><span class="o">></span>
+  <span class="k">constexpr</span> <span class="k">auto</span>
+  <span class="n">and_then</span><span class="p">(</span><span class="n">This</span><span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">,</span> <span class="n">F</span><span class="o">&amp;&amp;</span> <span class="n">f</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">{</span>
+    <span class="k">using</span> <span class="n">val</span> <span class="o">=</span> <span class="k">decltype</span><span class="p">(</span>
+        <span class="n">forward</span><span class="o">&lt;</span><span class="n">This</span><span class="o">></span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="n">m_value</span><span class="p">);</span>
+    <span class="k">using</span> <span class="n">result</span> <span class="o">=</span> <span class="n">invoke_result_t</span><span class="o">&lt;</span><span class="n">F</span><span class="p">,</span> <span class="n">val</span><span class="o">></span><span class="p">;</span>
+
+    <span class="k">static_assert</span><span class="p">(</span>
+      <span class="n">is_optional</span><span class="o">&lt;</span><span class="n">result</span><span class="o">>::</span><span class="n">value</span><span class="p">,</span>
+      <span class="s">"F must return an optional"</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">has_value</span><span class="p">()</span>
+        <span class="o">?</span> <span class="n">invoke</span><span class="p">(</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">F</span><span class="o">></span><span class="p">(</span><span class="n">f</span><span class="p">),</span>
+                 <span class="n">forward</span><span class="o">&lt;</span><span class="n">This</span><span class="o">></span>
+                   <span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="n">m_value</span><span class="p">)</span>
+        <span class="o">:</span> <span class="n">nullopt</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="c1">// ...</span>
+<span class="c1"></span><span class="p">};</span>
+</pre>
+   </table>
    <p>Keep in mind that there are a few more functions in P0798 that have this lead to this explosion of overloads, so the code difference and clarity is dramatic.</p>
    <p>For those that dislike returning auto in these cases, it is very easy to write a metafunction that matches the appropriate qualifiers from a type. Certainly simpler than copying and pasting code and hoping that the minor changes were made correctly in every case.</p>
    <h2 class="heading settled" data-level="5" id="sfinae-friendly-callables"><span class="secno">5. </span><span class="content">SFINAE-friendly callables</span><a class="self-link" href="#sfinae-friendly-callables"></a></h2>
    <p>Another seemingly unrelated problem is that of writing these numerous overloads for function wrappers, as demonstrated in P0826. <code class="highlight"><span class="n">std</span><span class="o">::</span><span class="n">not_fn</span></code> is specified to behave as if:</p>
-<pre class="highlight line-numbered"><span class="line-no" line="1"></span><div class="line"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">F</span><span class="o">></span></div><span class="line-no" line="2"></span><div class="line"><span class="k">class</span> <span class="nc">call_wrapper</span> <span class="p">{</span></div><span class="line-no" line="3"></span><div class="line">    <span class="n">F</span> <span class="n">f</span><span class="p">;</span></div><span class="line-no" line="4"></span><div class="line"><span class="k">public</span><span class="o">:</span></div><span class="line-no" line="5"></span><div class="line">    <span class="c1">// ...</span></div><span class="line-no" line="6"></span><div class="line"><span class="c1"></span>    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span><span class="p">...</span> <span class="n">Args</span><span class="o">></span></div><span class="line-no" line="7"></span><div class="line">    <span class="k">auto</span> <span class="k">operator</span><span class="p">()(</span><span class="n">Args</span><span class="o">&amp;&amp;</span><span class="p">...</span> <span class="p">)</span> <span class="o">&amp;</span></div><span class="line-no" line="8"></span><div class="line">        <span class="o">-></span> <span class="k">decltype</span><span class="p">(</span><span class="o">!</span><span class="n">declval</span><span class="o">&lt;</span><span class="n">invoke_result_t</span><span class="o">&lt;</span><span class="n">F</span><span class="o">&amp;</span><span class="p">,</span> <span class="n">Args</span><span class="p">...</span><span class="o">>></span><span class="p">());</span></div><span class="line-no" line="9"></span><div class="line"> </div><span class="line-no" line="10"></span><div class="line">    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span><span class="p">...</span> <span class="n">Args</span><span class="o">></span></div><span class="line-no" line="11"></span><div class="line">    <span class="k">auto</span> <span class="k">operator</span><span class="p">()(</span><span class="n">Args</span><span class="o">&amp;&amp;</span><span class="p">...</span> <span class="p">)</span> <span class="k">const</span><span class="o">&amp;</span></div><span class="line-no" line="12"></span><div class="line">        <span class="o">-></span> <span class="k">decltype</span><span class="p">(</span><span class="o">!</span><span class="n">declval</span><span class="o">&lt;</span><span class="n">invoke_result_t</span><span class="o">&lt;</span><span class="k">const</span> <span class="n">F</span><span class="o">&amp;</span><span class="p">,</span> <span class="n">Args</span><span class="p">...</span><span class="o">>></span><span class="p">());</span></div><span class="line-no" line="13"></span><div class="line"> </div><span class="line-no" line="14"></span><div class="line">    <span class="c1">// ...</span></div><span class="line-no" line="15"></span><div class="line"><span class="c1"></span><span class="p">};</span></div></pre>
+<pre class="highlight"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">F</span><span class="o">></span>
+<span class="k">class</span> <span class="nc">call_wrapper</span> <span class="p">{</span>
+    <span class="n">F</span> <span class="n">f</span><span class="p">;</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="c1">// ...</span>
+<span class="c1"></span>    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span><span class="p">...</span> <span class="n">Args</span><span class="o">></span>
+    <span class="k">auto</span> <span class="k">operator</span><span class="p">()(</span><span class="n">Args</span><span class="o">&amp;&amp;</span><span class="p">...</span> <span class="p">)</span> <span class="o">&amp;</span>
+        <span class="o">-></span> <span class="k">decltype</span><span class="p">(</span><span class="o">!</span><span class="n">declval</span><span class="o">&lt;</span><span class="n">invoke_result_t</span><span class="o">&lt;</span><span class="n">F</span><span class="o">&amp;</span><span class="p">,</span> <span class="n">Args</span><span class="p">...</span><span class="o">>></span><span class="p">());</span>
+
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span><span class="p">...</span> <span class="n">Args</span><span class="o">></span>
+    <span class="k">auto</span> <span class="k">operator</span><span class="p">()(</span><span class="n">Args</span><span class="o">&amp;&amp;</span><span class="p">...</span> <span class="p">)</span> <span class="k">const</span><span class="o">&amp;</span>
+        <span class="o">-></span> <span class="k">decltype</span><span class="p">(</span><span class="o">!</span><span class="n">declval</span><span class="o">&lt;</span><span class="n">invoke_result_t</span><span class="o">&lt;</span><span class="k">const</span> <span class="n">F</span><span class="o">&amp;</span><span class="p">,</span> <span class="n">Args</span><span class="p">...</span><span class="o">>></span><span class="p">());</span>
+
+    <span class="c1">// ...</span>
+<span class="c1"></span><span class="p">};</span>
+</pre>
    <p>which has the surprise result of incorrectly propagating the cv-qualifiers of the call wrapper:</p>
-<pre class="highlight line-numbered"><span class="line-no" line="1"></span><div class="line"><span class="k">struct</span> <span class="n">fun</span> <span class="p">{</span></div><span class="line-no" line="2"></span><div class="line">    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span><span class="p">...</span> <span class="n">Args</span><span class="o">></span></div><span class="line-no" line="3"></span><div class="line">    <span class="kt">void</span> <span class="k">operator</span><span class="p">()(</span><span class="n">Args</span><span class="o">&amp;&amp;</span><span class="p">...)</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span></div><span class="line-no" line="4"></span><div class="line"> </div><span class="line-no" line="5"></span><div class="line">    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span><span class="p">...</span> <span class="n">Args</span><span class="o">></span></div><span class="line-no" line="6"></span><div class="line">    <span class="kt">bool</span> <span class="k">operator</span><span class="p">()(</span><span class="n">Args</span><span class="o">&amp;&amp;</span><span class="p">...)</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> true<span class="p">;</span> <span class="p">}</span></div><span class="line-no" line="7"></span><div class="line"><span class="p">};</span></div><span class="line-no" line="8"></span><div class="line"> </div><span class="line-no" line="9"></span><div class="line"><span class="n">std</span><span class="o">::</span><span class="n">not_fn</span><span class="p">(</span><span class="n">fun</span><span class="p">{})();</span> <span class="c1">// ok? Returns false</span></div></pre>
+<pre class="highlight"><span class="k">struct</span> <span class="n">fun</span> <span class="p">{</span>
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span><span class="p">...</span> <span class="n">Args</span><span class="o">></span>
+    <span class="kt">void</span> <span class="k">operator</span><span class="p">()(</span><span class="n">Args</span><span class="o">&amp;&amp;</span><span class="p">...)</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span>
+
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span><span class="p">...</span> <span class="n">Args</span><span class="o">></span>
+    <span class="kt">bool</span> <span class="k">operator</span><span class="p">()(</span><span class="n">Args</span><span class="o">&amp;&amp;</span><span class="p">...)</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> true<span class="p">;</span> <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">not_fn</span><span class="p">(</span><span class="n">fun</span><span class="p">{})();</span> <span class="c1">// ok? Returns false</span>
+</pre>
    <p><code class="highlight"><span class="n">fun</span></code> shouldn’t be invocable unless it’s <code class="highlight"><span class="k">const</span></code>, but the simple approach of quadruplicating the overloads led to a situation where we can fallback to the const overload of the call wrapper (the <code class="highlight"><span class="o">&amp;&amp;</span></code>-qualified overload led to a substitution failure so we were able to fall back to the <code class="highlight"><span class="k">const</span><span class="o">&amp;&amp;</span></code>-qualified one, which succeeded). Implementing this correctly, while still preserving SFINAE-friendliness, is decidedly non-trivial.</p>
    <p>This proposal, however, offers a very simple solution to this problem: deduce <code class="highlight"><span class="k">this</span></code>:</p>
-<pre class="highlight line-numbered"><span class="line-no" line="1"></span><div class="line"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">F</span><span class="o">></span></div><span class="line-no" line="2"></span><div class="line"><span class="k">class</span> <span class="nc">call_wrapper</span> <span class="p">{</span></div><span class="line-no" line="3"></span><div class="line">    <span class="n">F</span> <span class="n">f</span><span class="p">;</span></div><span class="line-no" line="4"></span><div class="line"><span class="k">public</span><span class="o">:</span></div><span class="line-no" line="5"></span><div class="line">    <span class="c1">// ...</span></div><span class="line-no" line="6"></span><div class="line"><span class="c1"></span>    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="p">,</span> <span class="k">typename</span><span class="p">...</span> <span class="n">Args</span><span class="o">></span></div><span class="line-no" line="7"></span><div class="line">    <span class="k">auto</span> <span class="k">operator</span><span class="p">()(</span><span class="n">This</span><span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">,</span> <span class="n">Args</span><span class="o">&amp;&amp;</span><span class="p">...</span> <span class="p">)</span></div><span class="line-no" line="8"></span><div class="line">        <span class="o">-></span> <span class="k">decltype</span><span class="p">(</span><span class="o">!</span><span class="n">declval</span><span class="o">&lt;</span><span class="n">invoke_result_t</span><span class="o">&lt;</span><span class="n">match_qual_t</span><span class="o">&lt;</span><span class="n">This</span><span class="p">,</span> <span class="n">F</span><span class="o">></span><span class="p">,</span> <span class="n">Args</span><span class="p">...</span><span class="o">>></span><span class="p">());</span></div><span class="line-no" line="9"></span><div class="line">    <span class="c1">// ...</span></div><span class="line-no" line="10"></span><div class="line"><span class="c1"></span><span class="p">};</span></div><span class="line-no" line="11"></span><div class="line"> </div><span class="line-no" line="12"></span><div class="line"><span class="n">std</span><span class="o">::</span><span class="n">not_fn</span><span class="p">(</span><span class="n">fun</span><span class="p">{})();</span> <span class="c1">// error</span></div></pre>
+<pre class="highlight"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">F</span><span class="o">></span>
+<span class="k">class</span> <span class="nc">call_wrapper</span> <span class="p">{</span>
+    <span class="n">F</span> <span class="n">f</span><span class="p">;</span>
+<span class="k">public</span><span class="o">:</span>
+    <span class="c1">// ...</span>
+<span class="c1"></span>    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="p">,</span> <span class="k">typename</span><span class="p">...</span> <span class="n">Args</span><span class="o">></span>
+    <span class="k">auto</span> <span class="k">operator</span><span class="p">()(</span><span class="n">This</span><span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">,</span> <span class="n">Args</span><span class="o">&amp;&amp;</span><span class="p">...</span> <span class="p">)</span>
+        <span class="o">-></span> <span class="k">decltype</span><span class="p">(</span><span class="o">!</span><span class="n">declval</span><span class="o">&lt;</span><span class="n">invoke_result_t</span><span class="o">&lt;</span><span class="n">match_qual_t</span><span class="o">&lt;</span><span class="n">This</span><span class="p">,</span> <span class="n">F</span><span class="o">></span><span class="p">,</span> <span class="n">Args</span><span class="p">...</span><span class="o">>></span><span class="p">());</span>
+    <span class="c1">// ...</span>
+<span class="c1"></span><span class="p">};</span>
+
+<span class="n">std</span><span class="o">::</span><span class="n">not_fn</span><span class="p">(</span><span class="n">fun</span><span class="p">{})();</span> <span class="c1">// error</span>
+</pre>
    <p>Here, there is only one overload with everything deduced together, with This = fun. As this overload is not viable (because fun is not invocable unless it’s const), and there is no other overload, overload resolution is complete without a viable candidate. As desired.</p>
   </main>
 <script>

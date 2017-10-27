@@ -11,8 +11,8 @@ Group: wg21
 Audience: EWG
 Markup Shorthands: markdown yes
 Default Highlight: C++
-Line Numbers: yes
 </pre>
+
 
 # Motivation
 
@@ -21,17 +21,17 @@ In C++03, member functions could have cv-qualifications, so it was possible to h
 ```
 class TextBlock {
 public:
-    const char& operator[](std::size_t position) const {
-        // ...
-        return text[position];
-    }
+  const char& operator[](std::size_t position) const {
+     // ...
+    return text[position];
+  }
 
-    char& operator[](std::size_t position) {
-        return const_cast<char&>(
-            static_cast<const TextBlock&>(this)[position]
-            );
-    }
-    // ...
+  char& operator[](std::size_t position) {
+    return const_cast<char&>(
+      static_cast<const TextBlock&>(this)[position]
+    );
+  }
+  // ...
 };
 ```
 
@@ -66,7 +66,8 @@ class optional {
         throw bad_optional_access();
     }
 
-    constexpr const T&& value() const&& {
+    constexpr const T&&
+    value() const&& {
         if (has_value()) {
             return std::move(this->m_value);
         }
@@ -101,7 +102,8 @@ class optional {
                 *this).value());
     }
 
-    constexpr const T&& value() const&& {
+    constexpr const T&&
+    value() const&& {
         return static_cast<const T&&>(
             value());
     }
@@ -127,7 +129,8 @@ class optional {
         return value_impl(std::move(*this));
     }
 
-    constexpr const T&& value() const&& {
+    constexpr const T&&
+    value() const&& {
         return value_impl(std::move(*this));
     }
 
@@ -168,7 +171,7 @@ This is great - it's just one function, that handles all four cases for us. Exce
 There are many, many cases in code-bases where we need two or four overloads of the same member function for different `const`- or ref-qualifiers. More than that, there are likely many cases that a class should have four overloads of a particular member function, but doesn't simply due to laziness by the developer. We think that there are sufficiently many such cases that they merit a better solution than simply: write it, then write it again, then write it two more times.
 
 # Proposal
-    
+
 This paper proposes a new way of declaring a member function that allows for deducing the type and value category of the instance parameter, while still being invokable as a member function.
 
 We propose allowing the naming of the first parameter of a cv/ref-unqualified member function `this`, which shall be of reference type. The this parameter will be the explicit instance of class type, and can be deduced based on the qualification and value category of the class instance object on which the member function is invoked.
@@ -292,220 +295,245 @@ This proposal can de-duplicate and de-quadruplicate a large amount of code. In e
 
 The particular implementation of optional is Simon's, and can be viewed on [GitHub](https://github.com/TartanLlama/optional), and this example includes some functions that are proposed in P0798, with minor changes to better suit this format:
 
-## C++17
-
+<table>
+<tr><th>C++17</th><th>This proposal</th>
+<tr>
+<td>
 ```
 class TextBlock {
 public:
-
-    const char& operator[](std::size_t position) const {
-        // ...
-        return text[position];
-    }
-
-    char& operator[](std::size_t position) {
-        return const_cast<char&>(
-            static_cast<const TextBlock&>(this)[position]
-            );
-    }
+  const char&
+  operator[](std::size_t position) const {
     // ...
+    return text[position];
+  }
+
+  char& operator[](std::size_t position) {
+    return const_cast<char&>(
+      static_cast<const TextBlock&>
+        (this)[position]
+    );
+  }
+  // ...
 };
 ```
-
-## This proposal
-
+<td>
 ```
 class TextBlock {
 public:
-    template <typename This>
-    auto& operator[](This& this, std::size_t position) {
-        // ...
-        return this.text[position];
-    }
+  template <typename This>
+  auto& operator[](This& this,
+                   std::size_t position) {
     // ...
+    return this.text[position];
+  }
+  // ...
 };
 ```
+</td>
+</tr>
+<tr>
+<td>
+```
+template <typename T>
+class optional {
+  // ...
+  constexpr T* operator->() {
+    return std::addressof(
+      this->m_value);
+  }
 
-## C++17
+  constexpr const T*
+  operator->() const {
+    return std::addressof(
+      this->m_value);
+  }
+  // ...
+};
+```
+</td>
+<td>
+```
+template <typename T>
+class optional {
+  // ...
+  template <typename This>
+  constexpr auto operator->(This& this) {
+    return std::addressof(this.m_value);
+  }
+  // ...
+};
+```
+</td>
+</tr>
+
+<tr>
+<td>
+```
+template <typename T>
+class optional {
+  // ...
+  constexpr T& operator*() & {
+    return this->m_value;
+  }
+
+  constexpr const T& operator*() const& {
+    return this->m_value;
+  }
+
+  constexpr T&& operator*() && {
+    return std::move(this->m_value);
+  }
+
+  constexpr const T&&
+  operator*() const&& {
+    return std::move(this->m_value);
+  }
+
+  constexpr T& value() & {
+    if (has_value()) {
+      return this->m_value;
+    }
+    throw bad_optional_access();
+  }
+
+  constexpr const T& value() const& {
+    if (has_value()) {
+      return this->m_value;
+    }
+    throw bad_optional_access();
+  }
+
+  constexpr T&& value() && {
+    if (has_value()) {
+      return std::move(this->m_value);
+    }
+    throw bad_optional_access();
+  }
+
+  constexpr const T&& value() const&& {
+    if (has_value()) {
+      return std::move(this->m_value);
+    }
+    throw bad_optional_access();
+  }
+  // ...
+};
+```
+</td>
+<td>
 
 ```
 template <typename T>
 class optional {
-    // ...
-    constexpr T* operator->() {
-        return std::addressof(this->m_value);
-    }
+  // ...
+  template <typename This>
+  constexpr auto&& operator*(This&& this) {
+    return forward<This>(this).m_value;
+  }
 
-    constexpr const T* operator->() const {
-        return std::addressof(this->m_value);
+  template <typename This>
+  constexpr auto&& value(This&& this) {
+    if (this.has_value()) {
+      return forward<This>(this).m_value;
     }
-    // ...
+    throw bad_optional_access();
+  }
+  // ...
 };
 ```
+</td>
 
-## This proposal
-
+<tr>
+<td>
 ```
 template <typename T>
 class optional {
-    // ...
-    template <typename This>
-    constexpr auto operator->(This& this) {
-        return std::addressof(this.m_value);
-    }
-    // ...
+  // ...
+  template <typename F>
+  constexpr auto and_then(F&& f) & {
+    using result =
+      invoke_result_t<F, T&>;
+    static_assert(
+      is_optional<result>::value,
+      "F must return an optional");
+
+    return has_value()
+        ? invoke(forward<F>(f), **this)
+        : nullopt;
+  }
+
+  template <typename F>
+  constexpr auto and_then(F&& f) && {
+    using result =
+      invoke_result_t<F, T&&>;
+    static_assert(
+      is_optional<result>::value,
+      "F must return an optional");
+
+    return has_value()
+        ? invoke(forward<F>(f),
+                 std::move(**this))
+        : nullopt;
+  }
+
+  template <typename F>
+  constexpr auto and_then(F&& f) const& {
+    using result =
+      invoke_result_t<F, const T&>;
+    static_assert(
+      is_optional<result>::value,
+      "F must return an optional");
+
+    return has_value()
+        ? invoke(forward<F>(f), **this)
+        : nullopt;
+  }
+
+  template <typename F>
+  constexpr auto and_then(F&& f) const&& {
+    using result =
+      invoke_result_t<F, const T&&>;
+    static_assert(
+      is_optional<result>::value,
+      "F must return an optional");
+
+    return has_value()
+        ? invoke(forward<F>(f),
+                 std::move(**this))
+        : nullopt;
+  }
+  // ...
 };
 ```
-
-## C++17
-
+</td>
+<td>
 ```
 template <typename T>
 class optional {
-    // ...
-    constexpr T& operator*() & {
-        return this->m_value;
-    }
+  // ...
+  template <typename This, typename F>
+  constexpr auto
+  and_then(This&& this, F&& f) & {
+    using val = decltype(
+        forward<This>(this).m_value);
+    using result = invoke_result_t<F, val>;
 
-    constexpr const T& operator*() const& {
-        return this->m_value;
-    }
+    static_assert(
+      is_optional<result>::value,
+      "F must return an optional");
 
-    constexpr T&& operator*() && {
-        return std::move(this->m_value);
-    }
-
-    constexpr const T&& operator*() const&& {
-        return std::move(this->m_value);
-    }
-
-    constexpr T& value() & {
-        if (has_value()) {
-            return this->m_value;
-        }
-        throw bad_optional_access();
-    }
-
-    constexpr const T& value() const& {
-        if (has_value()) {
-            return this->m_value;
-        }
-        throw bad_optional_access();
-    }
-
-    constexpr T&& value() && {
-        if (has_value()) {
-            return std::move(this->m_value);
-        }
-        throw bad_optional_access();
-    }
-
-    constexpr const T&& value() const&& {
-        if (has_value()) {
-            return std::move(this->m_value);
-        }
-        throw bad_optional_access();
-    }
-    // ...
+    return this.has_value()
+        ? invoke(forward<F>(f),
+                 forward<This>
+                   (this).m_value)
+        : nullopt;
+  }
+  // ...
 };
 ```
-
-## This proposal
-
-```
-template <typename T>
-class optional {
-    // ...
-    template <typename This>
-    constexpr auto&& operator*(This&& this) {
-        return std::forward<This>(this).m_value;
-    }
-
-    template <typename This>
-    constexpr auto&& value(This&& this) {
-        if (this.has_value()) {
-            return std::forward<This>(this).m_value;
-        }
-        throw bad_optional_access();
-    }
-    // ...
-};
-```
-
-## C++17
-
-```
-template <typename T>
-class optional {
-    // ...
-    template <typename F>
-    constexpr auto and_then(F&& f) & {
-        using result = invoke_result_t<F, T&>;
-        static_assert(is_optional<result>::value,
-                      "F must return an optional");
-
-        return has_value()
-            ? invoke(std::forward<F>(f), **this)
-            : nullopt;
-    }
-
-    template <typename F>
-    constexpr auto and_then(F&& f) && {
-        using result = invoke_result_t<F, T&&>;
-        static_assert(is_optional<result>::value,
-                      "F must return an optional");
-
-        return has_value()
-            ? invoke(std::forward<F>(f), std::move(**this))
-            : nullopt;
-    }
-
-    template <typename F>
-    constexpr auto and_then(F&& f) const& {
-        using result = invoke_result_t<F, const T&>;
-        static_assert(is_optional<result>::value,
-                      "F must return an optional");
-
-        return has_value()
-            ? invoke(std::forward<F>(f), **this)
-            : nullopt;
-    }
-
-    template <typename F>
-    constexpr auto and_then(F&& f) const&& {
-        using result = invoke_result_t<F, const T&&>;
-        static_assert(is_optional<result>::value,
-                      "F must return an optional");
-
-        return has_value()
-            ? invoke(std::forward<F>(f), std::move(**this))
-            : nullopt;
-    }
-    // ...
-};
-```
-
-## This proposal
-
-```
-template <typename T>
-class optional {
-    // ...
-    template <typename This, typename F>
-    constexpr auto and_then(This&& this, F&& f) & {
-        using result = invoke_result_t<F, decltype((
-                                                       std::forward<This>(this).m_value))>;
-        static_assert(is_optional<result>::value,
-                      "F must return an optional");
-
-        return this.has_value()
-            ? invoke(std::forward<F>(f),
-                     std::forward<This>(this).m_value)
-            : nullopt;
-    }
-    // ...
-};
-```
+</td>
+</table>
 
 Keep in mind that there are a few more functions in P0798 that have this lead to this explosion of overloads, so the code difference and clarity is dramatic.
 
