@@ -6,7 +6,6 @@ Shortname: dXXXX
 Level: 0
 Editor: Barry Revzin, barry.revzin@gmail.com
 Editor: Simon Brand, simon@codeplay.com
-Abstract: Put abstract here
 Group: wg21
 Audience: EWG
 Markup Shorthands: markdown yes
@@ -22,7 +21,7 @@ In C++03, member functions could have *cv*-qualifications, so it was possible to
 class TextBlock {
 public:
   const char& operator[](std::size_t position) const {
-     // ...
+    // ...
     return text[position];
   }
 
@@ -147,9 +146,10 @@ private:
     // ...
 };
 ```
-</td></tr></table>
+</td></tr>
+</table>
 
-It's not like this is a complicated function. Far from. But more or less repeating the same code four times, or artificial delegation to avoid doing so, is the kind of thing that begs for a rewrite. Except we can't really. We _have_ to implement it this way. It seems like we should be able to abstract away the qualifiers. And we can... sort of. As a non-member function, we simply don't have this problem:
+It's not like this is a complicated function. Far from. But more or less repeating the same code four times, or artificial delegation to avoid doing so, is the kind of thing that begs for a rewrite. Except we can't really. We *have* to implement it this way. It seems like we should be able to abstract away the qualifiers. And we can... sort of. As a non-member function, we simply don't have this problem:
 
 ```
 template <typename T>
@@ -180,7 +180,7 @@ We propose allowing the first parameter of a member function to be named `this`,
  - The member function shall not be `static`
  - The type of the `this` parameter shall be either:
 	 - a reference to possibly *cv*-qualified function template parameter
-	 - a reference to possibly *cv*-qualified _injected-class-name_
+	 - a reference to possibly *cv*-qualified *injected-class-name*
 
 The `this` parameter will bind to the implicit object argument, as if it were passed as the first argument to a non-member function with the same signature. 
 
@@ -245,7 +245,7 @@ d.do_stuff();  // invokes B::do_stuff<B&>, not B::do_stuff<D&>
 
 Within these member functions, the keyword `this` will be used as a reference, not as a pointer. While inconsistent with usage in normal member functions, it is more consistent with its declaration as a parameter of reference type and its ability to be deduced as a forwarding reference. This difference will be a signal to users that this is a different kind of member function, additionally obviating any questions about checking against `nullptr`. 
 
-Accessing members would be done via `this.mem` and not `this->mem`. There is no implicit `this` object, since we now have an _explicit_ instance parameter, so all member access must be qualified:
+Accessing members would be done via `this.mem` and not `this->mem`. There is no implicit `this` object, since we now have an *explicit* instance parameter, so all member access must be qualified:
 
 ```
 template <typename T>
@@ -260,7 +260,7 @@ public:
 };
 ```
 
-The only allowed types for the `this` parameter are reference to function template parameter and reference to _injected-class-name_. We do not expect the latter form to be used very often, but likewise we see no reason to artificially limit the proposal to templates.
+The only allowed types for the `this` parameter are reference to function template parameter and reference to *injected-class-name*. We do not expect the latter form to be used very often, but likewise we see no reason to artificially limit the proposal to templates.
 
 ```
 template <typename T>
@@ -551,8 +551,8 @@ class optional {
   template <typename This, typename F>
   constexpr auto
   and_then(This&& this, F&& f) & {
-    using val = decltype(
-        forward<This>(this).m_value);
+    using val = decltype((
+        forward<This>(this).m_value));
     using result = invoke_result_t<F, val>;
 
     static_assert(
@@ -663,12 +663,12 @@ In the specific case of lambdas, a lambda could both capture `this` and take a g
 
 ```
 struct A {
-	int bar();
+    int bar();
 
     auto foo() {
-	    return [this](auto& this, int n) {
-		    return this->bar() + n; // error: no operator->() for this lambda
-	    };
+        return [this](auto& this, int n) {
+            return this->bar() + n; // error: no operator->() for this lambda
+        };
     }
 };
 ```
