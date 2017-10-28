@@ -16,7 +16,7 @@ Default Highlight: C++
 
 # Motivation
 
-In C++03, member functions could have cv-qualifications, so it was possible to have scenarios where a particular class would want both a `const` and non-`const` overload of a particular member (Of course it was possible to also want `volatile` overloads, but those are less common). In these cases, both overloads do the same thing - the only difference is in the types accessed and used. This was handled by either simply duplicating the function, adjusting types and qualifications as necessary, or having one delegate to the other. An example of the latter can be found in Scott Meyers' "Effective C++", Item 3:
+In C++03, member functions could have *cv*-qualifications, so it was possible to have scenarios where a particular class would want both a `const` and non-`const` overload of a particular member (Of course it was possible to also want `volatile` overloads, but those are less common). In these cases, both overloads do the same thing - the only difference is in the types accessed and used. This was handled by either simply duplicating the function, adjusting types and qualifications as necessary, or having one delegate to the other. An example of the latter can be found in Scott Meyers' "Effective C++", Item 3:
 
 ```
 class TextBlock {
@@ -39,8 +39,9 @@ Neither the duplication or the delegation via `const_cast` are arguably great so
 
 In C++11, member functions acquired a new axis to specialize on: ref-qualifiers. Now, instead of potentially needing two overloads of a single member function, we might need four: `&`, `const&`, `&&`, or `const&&`. We have three approaches to deal with this: we implement the same member four times, we can have three of the overloads delegate to the fourth, or we can have all four delegate to a helper, private static member function. One example might be the overload set for `optional<T>::value()`. The way to implement it would be something like:
 
-## Quadruplication
-
+<table>
+<tr><th>Quadruplication</th><th>Delegation to 4th</th><th>Delegation to helper</th></tr>
+<tr><td>
 ```
 template <typename T>
 class optional {
@@ -76,9 +77,8 @@ class optional {
     // ...
 };
 ```
-
-## Delegate to 4th
-
+</td>
+<td>
 ```
 template <typename T>
 class optional {
@@ -110,9 +110,8 @@ class optional {
     // ...
 };
 ```
-
-## Delegate to helper
-
+</td>
+<td>
 ```
 template <typename T>
 class optional {
@@ -148,6 +147,7 @@ private:
     // ...
 };
 ```
+</td></tr></table>
 
 It's not like this is a complicated function. Far from. But more or less repeating the same code four times, or artificial delegation to avoid doing so, is the kind of thing that begs for a rewrite. Except we can't really. We _have_ to implement it this way. It seems like we should be able to abstract away the qualifiers. And we can... sort of. As a non-member function, we simply don't have this problem:
 
@@ -174,22 +174,37 @@ There are many, many cases in code-bases where we need two or four overloads of 
 
 This paper proposes a new way of declaring a member function that will allow for deducing the type and value category of the class instance parameter, while still being invokable as a member function.
 
-We propose allowing the naming of the first parameter of a cv/ref-unqualified member function `this`, which shall be of reference type. The `this` parameter will bind to the implicit object argument, as if it were passed as the first argument to a non-member function with the same signature. 
+We propose allowing the naming of the first parameter of a member function `this` with the following restrictions:
+
+ - The member function shall not have any *cv*- or ref-qualifiers
+ - The member function shall not be `static`
+ - The type of the `this` parameter shall be either:
+	 - a reference to possibly *cv*-qualified function template parameter
+	 - a reference to possibly *cv*-qualified _injected-class-name_
+
+The `this` parameter will bind to the implicit object argument, as if it were passed as the first argument to a non-member function with the same signature. 
 
 ```
 struct X {
+    void foo(X& this);
+
     template <typename This>
-    void foo(This&& this, int i);
+    void bar(This&& this, int i);
 };
 
-// X::foo is a member function taking one argument of type int
+// X::foo is member function taking no arguments, X::bar takes one 
+// argument of type int
 X x;
-x.foo(0);
+x.foo();
+x.bar(0);
 
-// and is deduced as if the call were to this non-member function
+// These behave as if the call were to thes non-member functions
+void foo(X& obj);
+
 template <typename This>
-void foo(This&& obj, int i);
-foo(x, 0);
+void bar(This&& obj, int i);
+foo(x);
+bar(x, 0);
 ```
 
 The usual template deduction rules apply to the `this` parameter. While the naming of the parameter `this` is significant, the naming of the template type parameter as `This` is not. It is used throughout merely a suggested convention.
@@ -212,7 +227,7 @@ void demo(Y y, const Y* py) {
     py->quux();   // invokes Y::quux<const Y>
 }
 ```
-It will still be possible to take pointers to these member functions. Their types would be qualified based on the deduced qualification of the instance object. That is, `decltype(&Y::bar<Y, int>)` is `void (Y::*)(int) &&` and `decltype(&Y::quux<const Y>)` is `void (Y::*)() const&`. These member functions can be invoked via pointers to members as usual. 
+It will be possible to take pointers to these member functions. Their types would be qualified based on the deduced qualification of the instance object. That is, `decltype(&Y::bar<Y, int>)` is `void (Y::*)(int) &&` and `decltype(&Y::quux<const Y>)` is `void (Y::*)() const&`. These member functions can be invoked via pointers to members as usual. 
 
 While the type of the `this` parameter is deduced, it will always be some qualified form of the class type in which the member function is declared, never a derived type:
 
@@ -245,38 +260,24 @@ public:
 };
 ```
 
-While the examples so far all have `this` as a parameter whose type is deduced, we will also allow using the _injected-class-name_ as the type of the parameter. No other form will be allowed. We do not expect this form to be used very often, but likewise we see no reason to artificially limit the proposal to templates.
+The only allowed types for the `this` parameter are reference to function template parameter and reference to _injected-class-name_. We do not expect the latter form to be used very often, but likewise we see no reason to artificially limit the proposal to templates.
 
 ```
-struct A {
-    int i;
-
-    // C++11
-    void foo() & { std::cout << i; }
-
-    // this proposal: ok, if unlikely to be used
-    void foo(A& this) { std::cout << this.i; }
-
-    // error: this as a parameter must have reference type
-    void foo(A* this) { std::cout << this->i; }
-};
-
 template <typename T>
 struct B {
-    // preferred
     template <typename This>
-    void best(This&& this);
+    void a(This&& this);      // ok
 
-    // ok
-    void good(B& this); 
+    void b(B& this);          // ok
+    template <typename This>
+    void c(const This& this); // ok
 
-    // not supported: injected-class-name only
-    void bad1(B<T>& this);
-
-    // not supported: template parameter type must be of
-    // the form T& or T&& only
+    void d(B this);           // error: not a reference type
+    void e(B* this);          // error: not a reference type
+    void f(B<T>& this);       // error: not injected-class-name
     template <typename U>
-    void bad2(B<U*>& this);
+    void g(B<U*>& this);      // error: not reference to template-parameter
+    void h(T& this);          // error: not reference to function's template-parameter
 };
 ```
 
@@ -331,7 +332,7 @@ This proposal can de-duplicate and de-quadruplicate a large amount of code. In e
 The particular implementation of optional is Simon's, and can be viewed on [GitHub](https://github.com/TartanLlama/optional), and this example includes some functions that are proposed in P0798, with minor changes to better suit this format:
 
 <table>
-<tr><th>C++17</th><th>This proposal</th>
+<tr><th>C++17</th><th>This proposal</th></tr>
 <tr>
 <td>
 ```
@@ -597,7 +598,7 @@ public:
 };
 ```
 
-which has the surprise result of incorrectly propagating the cv-qualifiers of the call wrapper. From the paper:
+which has the surprise result of incorrectly propagating the *cv*-qualifiers of the call wrapper. From the paper:
 
 ```
 struct fun {
