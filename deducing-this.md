@@ -174,7 +174,7 @@ There are many, many cases in code-bases where we need two or four overloads of 
 
 This paper proposes a new way of declaring a member function that will allow for deducing the type and value category of the class instance parameter, while still being invokable as a member function.
 
-We propose allowing the naming of the first parameter of a member function `this` with the following restrictions:
+We propose allowing the first parameter of a member function to be named `this`, with the following restrictions:
 
  - The member function shall not have any *cv*- or ref-qualifiers
  - The member function shall not be `static`
@@ -198,7 +198,7 @@ X x;
 x.foo();
 x.bar(0);
 
-// These behave as if the call were to thes non-member functions
+// These behave as if the call were to these non-member functions
 void foo(X& obj);
 
 template <typename This>
