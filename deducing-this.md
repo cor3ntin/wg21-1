@@ -172,7 +172,7 @@ There are many, many cases in code-bases where we need two or four overloads of 
 
 # Proposal
 
-This paper proposes a new way of declaring a member function that will allow for deducing the type and value category of the class instance parameter, while still being invokable as a member function.
+This paper proposes a new way of declaring a member function that will allow for deducing the type and value category of the class instance parameter, while still being invocable as a member function.
 
 We propose allowing the first parameter of a member function to be named `this`, with the following restrictions:
 
@@ -320,10 +320,68 @@ struct X {
     decltype(auto) foo() This&& {
         return std::forward<This>(*this).value;
     }
+
+    // another alternative
+    decltype(auto) foo() auto&& {
+        return std::forward<decltype(*this)>(*this).value;
+    }
 };
 ```
 
-# Examples
+# Minimal Translations
+
+The most common qualifier overload sets for member functions are:
+
+1. `const` and non-`const`
+2. `&`, `const&`, `&&`, and `const&&`
+3. `const&` and `&&`
+
+Some examples:
+
+<table>
+<tr><th>1</th><th>2</th><th>3</th></tr>
+<td>
+```
+struct foo {
+  void bar();
+  void bar() const;
+};
+```
+</td>
+<td>
+```
+struct foo {
+  void bar() &;
+  void bar() const&;
+  void bar() &&;
+  void bar() const&&;  
+};
+```
+</td>
+<td>
+```
+struct foo {
+  void bar() const&;
+  void bar() &&;
+};
+```
+</td>
+</tr>
+</table>
+
+The all three of these can be handled by a single perfect-forwarding overload, like this:
+
+```
+struct foo {
+    template <class This>
+    void bar (This&& this);
+};
+```
+
+This overload is callable for all `const`- and ref-qualified object parameters, just like the above examples. It is also callable for `volatile`-qualified objects, so the code is not entirely equivalent; however, the `volatile` versions are unlikely to be invalid and more likely to be simply left out for the sake of brevity. The only major difference is in the third case, where non-`const` lvalue arguments would be non-`const` inside the function body, and `const` rvalue arguments would be `const&&` instead of `const&`. Again, this is unlikely to cause correctness issues unless `this` has other member functions called on it which do semantically different things depending on the cv-qualification of `this`.
+
+
+# Real-World Examples
 
 ## Deduplicating Code
 
@@ -358,7 +416,7 @@ public:
 class TextBlock {
 public:
   template <typename This>
-  auto& operator[](This& this,
+  auto& operator[](This&& this,
                    std::size_t position) {
     // ...
     return this.text[position];
@@ -392,7 +450,7 @@ template <typename T>
 class optional {
   // ...
   template <typename This>
-  constexpr auto operator->(This& this) {
+  constexpr auto operator->(This&& this) {
     return std::addressof(this.m_value);
   }
   // ...
