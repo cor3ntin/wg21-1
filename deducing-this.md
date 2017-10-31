@@ -300,35 +300,7 @@ void demo(C* c, C const* d) {
 
 As `this` cannot be used as a parameter name today, this proposal is purely a language extension. All current syntax remains valid.
 
-## Alternative syntax
-
-Rather than naming the first parameter `this`, we can also consider introducing a dummy template parameter where the qualifications normally reside. This syntax is also ill-formed today, and is purely a language extension:
-
-```
-template <typename T>
-struct X {
-    T value;
-
-    // as proposed
-    template <typename This>
-    decltype(auto) foo(This&& this) {
-        return std::forward<This>(this).value;
-    }
-
-    // alternative
-    template <typename This>
-    decltype(auto) foo() This&& {
-        return std::forward<This>(*this).value;
-    }
-
-    // another alternative
-    decltype(auto) foo() auto&& {
-        return std::forward<decltype(*this)>(*this).value;
-    }
-};
-```
-
-# Minimal Translations
+## Minimal Translations
 
 The most common qualifier overload sets for member functions are:
 
@@ -369,7 +341,7 @@ struct foo {
 </tr>
 </table>
 
-The all three of these can be handled by a single perfect-forwarding overload, like this:
+All three of these can be handled by a single perfect-forwarding overload, like this:
 
 ```
 struct foo {
@@ -380,6 +352,33 @@ struct foo {
 
 This overload is callable for all `const`- and ref-qualified object parameters, just like the above examples. It is also callable for `volatile`-qualified objects, so the code is not entirely equivalent; however, the `volatile` versions are unlikely to be invalid and more likely to be simply left out for the sake of brevity. The only major difference is in the third case, where non-`const` lvalue arguments would be non-`const` inside the function body, and `const` rvalue arguments would be `const&&` instead of `const&`. Again, this is unlikely to cause correctness issues unless `this` has other member functions called on it which do semantically different things depending on the cv-qualification of `this`.
 
+## Alternative syntax
+
+Rather than naming the first parameter `this`, we can also consider introducing a dummy template parameter where the qualifications normally reside. This syntax is also ill-formed today, and is purely a language extension:
+
+```
+template <typename T>
+struct X {
+    T value;
+
+    // as proposed
+    template <typename This>
+    decltype(auto) foo(This&& this) {
+        return std::forward<This>(this).value;
+    }
+
+    // alternative
+    template <typename This>
+    decltype(auto) foo() This&& {
+        return std::forward<This>(*this).value;
+    }
+
+    // another alternative
+    decltype(auto) foo() auto&& {
+        return std::forward<decltype(*this)>(*this).value;
+    }
+};
+```
 
 # Real-World Examples
 
@@ -387,7 +386,7 @@ This overload is callable for all `const`- and ref-qualified object parameters, 
 
 This proposal can de-duplicate and de-quadruplicate a large amount of code. In each case, the single function is only slightly more complex than the initial two or four, which makes for a huge win. What follows are a few examples of how repeated code can be reduced.
 
-The particular implementation of optional is Simon's, and can be viewed on [GitHub](https://github.com/TartanLlama/optional), and this example includes some functions that are proposed in [\[P0798\]](https://wg21.link/p0798), with minor changes to better suit this format:
+The particular implementation of optional is Simon's, and can be viewed on [GitHub](https://github.com/TartanLlama/optional), and this example includes some functions that are proposed in [P0798](https://wg21.link/p0798), with minor changes to better suit this format:
 
 <table>
 <tr><th>C++17</th><th>This proposal</th></tr>
@@ -634,7 +633,7 @@ For those that dislike returning auto in these cases, it is very easy to write a
 
 ## SFINAE-friendly callables
 
-A seemingly unrelated problem to the question of code quadruplication is that of writing these numerous overloads for function wrappers, as demonstrated in [\[P0826\]](https://wg21.link/p0826). Consider what happens if we implement `std::not_fn()`, as currently specified:
+A seemingly unrelated problem to the question of code quadruplication is that of writing these numerous overloads for function wrappers, as demonstrated in [P0826](https://wg21.link/p0826). Consider what happens if we implement `std::not_fn()`, as currently specified:
 
 ```
 template <typename F>
