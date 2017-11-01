@@ -182,7 +182,7 @@ We propose allowing the first parameter of a member function to be named `this`,
 	 - a reference to possibly *cv*-qualified function template parameter
 	 - a reference to possibly *cv*-qualified *injected-class-name*
 
-The `this` parameter will bind to the implicit object argument, as if it were passed as the first argument to a non-member function with the same signature. 
+The `this` parameter will bind to the implicit object argument, as if it were passed as the first argument to a non-member function with the same signature. As `this` cannot be used as a parameter name today, this proposal is purely a language extension. All current syntax remains valid.
 
 ```
 struct X {
@@ -207,15 +207,21 @@ foo(x);
 bar(x, 0);
 ```
 
+Within these member functions, the keyword `this` will be used as a reference, not as a pointer. While inconsistent with usage in normal member functions, it is more consistent with its declaration as a parameter of reference type and its ability to be deduced as a forwarding reference. This difference will be a signal to users that this is a different kind of member function, additionally obviating any questions about checking against `nullptr`.
+
+Since in many ways member functions act as if they accepted an instance of class type as their first parameter (for instance, in `INVOKE` and all the functional objects that rely on this), we believe this is a logical extension of the language rules to solve a common and growing source of frustration. This sort of code deduplication is, after all, precisely what templates are for.
+
 The usual template deduction rules apply to the `this` parameter. While the naming of the parameter `this` is significant, the naming of the template type parameter as `This` is not. It is used throughout merely a suggested convention.
 
 ```
 struct Y {
+    int i;
+
     template <typename This, typename T>
     void bar(This&& this, T&& );
 
     template <typename Self>
-    void quux(Self& this);
+    auto& quux(Self& this) { return this.i; }
 };
 
 void demo(Y y, const Y* py) {
@@ -227,7 +233,7 @@ void demo(Y y, const Y* py) {
     py->quux();   // invokes Y::quux<const Y>
 }
 ```
-It will be possible to take pointers to these member functions. Their types would be qualified based on the deduced qualification of the instance object. That is, `decltype(&Y::bar<Y, int>)` is `void (Y::*)(int) &&` and `decltype(&Y::quux<const Y>)` is `void (Y::*)() const&`. These member functions can be invoked via pointers to members as usual. 
+It will be possible to take pointers to these member functions. Their types would be qualified based on the deduced qualification of the instance object. That is, `decltype(&Y::bar<Y, int>)` is `void (Y::*)(int) &&` and `decltype(&Y::quux<const Y>)` is `const int& (Y::*)() const&`. These member functions can be invoked via pointers to members as usual.
 
 While the type of the `this` parameter is deduced, it will always be some qualified form of the class type in which the member function is declared, never a derived type:
 
@@ -242,8 +248,6 @@ struct D : B { };
 D d;
 d.do_stuff();  // invokes B::do_stuff<B&>, not B::do_stuff<D&>
 ```
-
-Within these member functions, the keyword `this` will be used as a reference, not as a pointer. While inconsistent with usage in normal member functions, it is more consistent with its declaration as a parameter of reference type and its ability to be deduced as a forwarding reference. This difference will be a signal to users that this is a different kind of member function, additionally obviating any questions about checking against `nullptr`. 
 
 Accessing members would be done via `this.mem` and not `this->mem`. There is no implicit `this` object, since we now have an *explicit* instance parameter, so all member access must be qualified:
 
@@ -281,8 +285,6 @@ struct B {
 };
 ```
 
-Since in many ways member functions act as if they accepted an instance of class type as their first parameter (for instance, in `INVOKE` and all the functional objects that rely on this), we believe this is a logical extension of the language rules to solve a common and growing source of frustration. This sort of code deduplication is, after all, precisely what templates are for.
-
 Overload resolution between new-style and old-style member functions would compare the explicit this parameter of the new functions with the implicit this parameter of the old functions:
 
 ```
@@ -298,7 +300,16 @@ void demo(C* c, C const* d) {
 }
 ```
 
-As `this` cannot be used as a parameter name today, this proposal is purely a language extension. All current syntax remains valid.
+As these functions are still member functions, they will always take as their first argument an instance of class type. As such, it makes little sense to accept a default argument for the `this` parameter, nor a default type parameter in the case of a function template. Such a defaulted type or argument would never be used anyway and as such would be a sign of user error. This proposal suggests that such use be ill-formed:
+
+```
+struct A {
+    template <typename This=A> // error
+    void foo(This&& this);
+
+    void bar(A&& this = A{});  // error
+};
+```
 
 ## Minimal Translations
 
@@ -379,6 +390,12 @@ struct X {
     }
 };
 ```
+
+## Unified Function Call Syntax
+
+The proposed use of `this` as the first parameter seems as if these members functions really had better be written as non-members to begin with, and might suggest that the solution to this problem is really unified function call syntax (UFCS).
+
+However, several of the motivating examples presented in this proposal are implementations of operators that cannot be implemented as non-members (`()`, `[]`, `->`, and unary `*`). UFCS alone would be insufficient. Additionally, the member function overload sets in all of these examples exist as *member* functions, not free functions, today. Having to take a member function overload set and rewrite it as a non-member (likely `friend`ed) free function template is very much changing the intended design of a class to overcome a language hurdle. This proposal contends that it would be more in keeping with programmer intent to allow member functions to stay member functions.
 
 # Real-World Examples
 
