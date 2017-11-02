@@ -2,7 +2,7 @@
 Title: Deducing this
 Status: D
 ED: wg21.tartanllama.xyz/deducing-this
-Shortname: dXXXX
+Shortname: D0847R0
 Level: 0
 Editor: Barry Revzin, barry.revzin@gmail.com
 Editor: Simon Brand, simon@codeplay.com
