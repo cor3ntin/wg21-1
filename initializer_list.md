@@ -4,7 +4,7 @@ Status: D
 ED: wg21.tartanllama.xyz/initializer_lst
 Shortname: dXXXX
 Level: 0
-Editor: Chris Di Bella, christopher@codeplay.com
+Editor: Christopher Di Bella, christopher@codeplay.com
 Editor: Simon Brand, simon@codeplay.com
 Group: wg21
 Audience: LEWG
