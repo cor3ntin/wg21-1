@@ -1176,49 +1176,50 @@ Possible extra rowspan handling
 		}
 	}
 </style>
+  <link href="https://fonts.googleapis.com/css?family=Inconsolata|PT+Sans" rel="stylesheet">
 <style>
     body {
-      font-family: 'PT Sans', sans-serif;
+    font-family: 'PT Sans', sans-serif;
     }
 
     pre, code {
-      font-family: 'Inconsolata', monospace;
-      font-size: 0.9em;
+    font-family: 'Inconsolata', monospace;
+    font-size: 0.9em;
     }
 
     code.highlight {
-      padding: 0.2em 0.4em 0.2em 0.4em !important;
+    padding: 0.2em 0.4em 0.2em 0.4em !important;
     }
 
     h1, h2, h3, h4, h5, h6 {
-      color: #000000;
+    color: #000000;
     }
 
     a[href] {
-      border: none;
+    border: none;
     }
 
     code.highlight span.n {
-      color: #000000;
+    color: #000000;
     }
 
     .highlight:not(.idl) {
-      background: hsl(0, 0%, 97%) !important;
+    background: hsl(0, 0%, 97%) !important;
     }
 
     td {
-      background: hsl(0, 0%, 97%);
-      vertical-align: top;
-      border: 1px black solid;
+    background: hsl(0, 0%, 97%);
+    vertical-align: top;
+    border: 1px black solid;
     }
 
     table {
-      border-collapse: collapse;
+    border-collapse: collapse;
     }
-    </style>
+  </style>
   <meta content="Bikeshed version 0d6a1c7475b7bb2485f411c7e73d9990fd0cfef5" name="generator">
   <link href="wg21.tartanllama.xyz/deducing-this" rel="canonical">
-  <meta content="013690f272367d37c592eca70bfa1da518cabdfc" name="document-revision">
+  <meta content="f7c5c33f41bee46fa9672d1303a457f35d1c223f" name="document-revision">
 <style>/* style-md-lists */
 
 /* This is a weird hack for me not yet following the commonmark spec
@@ -1428,7 +1429,7 @@ pre .property::before, pre .property::after {
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">dxxxxr0<br>Deducing this</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Proposal, <time class="dt-updated" datetime="2017-10-28">28 October 2017</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Proposal, <time class="dt-updated" datetime="2017-10-31">31 October 2017</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1449,7 +1450,6 @@ pre .property::before, pre .property::after {
   </div>
   <div class="p-summary" data-fill-with="abstract">
    <h2 class="no-num no-toc no-ref heading settled" id="abstract"><span class="content">Abstract</span></h2>
-   <p>Put abstract here</p>
   </div>
   <nav data-fill-with="table-of-contents" id="toc">
    <h2 class="no-num no-toc no-ref" id="contents">Table of Contents</h2>
@@ -1460,12 +1460,13 @@ pre .property::before, pre .property::after {
      <ol class="toc">
       <li><a href="#alternative-syntax"><span class="secno">2.1</span> <span class="content">Alternative syntax</span></a>
      </ol>
+    <li><a href="#minimal-translations"><span class="secno">3</span> <span class="content">Minimal Translations</span></a>
     <li>
-     <a href="#examples"><span class="secno">3</span> <span class="content">Examples</span></a>
+     <a href="#real-world-examples"><span class="secno">4</span> <span class="content">Real-World Examples</span></a>
      <ol class="toc">
-      <li><a href="#deduplicating-code"><span class="secno">3.1</span> <span class="content">Deduplicating Code</span></a>
-      <li><a href="#sfinae-friendly-callables"><span class="secno">3.2</span> <span class="content">SFINAE-friendly callables</span></a>
-      <li><a href="#recursive-lambdas"><span class="secno">3.3</span> <span class="content">Recursive Lambdas</span></a>
+      <li><a href="#deduplicating-code"><span class="secno">4.1</span> <span class="content">Deduplicating Code</span></a>
+      <li><a href="#sfinae-friendly-callables"><span class="secno">4.2</span> <span class="content">SFINAE-friendly callables</span></a>
+      <li><a href="#recursive-lambdas"><span class="secno">4.3</span> <span class="content">Recursive Lambdas</span></a>
      </ol>
    </ol>
   </nav>
@@ -1475,7 +1476,7 @@ pre .property::before, pre .property::after {
 <pre class="highlight"><span class="k">class</span> <span class="nc">TextBlock</span> <span class="p">{</span>
 <span class="k">public</span><span class="o">:</span>
   <span class="k">const</span> <span class="kt">char</span><span class="o">&amp;</span> <span class="k">operator</span><span class="p">[](</span><span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">position</span><span class="p">)</span> <span class="k">const</span> <span class="p">{</span>
-     <span class="c1">// ...</span>
+    <span class="c1">// ...</span>
 <span class="c1"></span>    <span class="k">return</span> <span class="n">text</span><span class="p">[</span><span class="n">position</span><span class="p">];</span>
   <span class="p">}</span>
 
@@ -1598,7 +1599,7 @@ pre .property::before, pre .property::after {
 <span class="c1"></span><span class="p">};</span>
 </pre>
    </table>
-   <p>It’s not like this is a complicated function. Far from. But more or less repeating the same code four times, or artificial delegation to avoid doing so, is the kind of thing that begs for a rewrite. Except we can’t really. We _have_ to implement it this way. It seems like we should be able to abstract away the qualifiers. And we can... sort of. As a non-member function, we simply don’t have this problem:</p>
+   <p>It’s not like this is a complicated function. Far from. But more or less repeating the same code four times, or artificial delegation to avoid doing so, is the kind of thing that begs for a rewrite. Except we can’t really. We <em>have</em> to implement it this way. It seems like we should be able to abstract away the qualifiers. And we can... sort of. As a non-member function, we simply don’t have this problem:</p>
 <pre class="highlight"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span>
 <span class="k">class</span> <span class="nc">optional</span> <span class="p">{</span>
     <span class="c1">// ...</span>
@@ -1615,7 +1616,7 @@ pre .property::before, pre .property::after {
    <p>This is great - it’s just one function, that handles all four cases for us. Except it’s a non-member function, not a member function. Different semantics, different syntax, doesn’t help.</p>
    <p>There are many, many cases in code-bases where we need two or four overloads of the same member function for different <code class="highlight"><span class="k">const</span></code>- or ref-qualifiers. More than that, there are likely many cases that a class should have four overloads of a particular member function, but doesn’t simply due to laziness by the developer. We think that there are sufficiently many such cases that they merit a better solution than simply: write it, then write it again, then write it two more times.</p>
    <h2 class="heading settled" data-level="2" id="proposal"><span class="secno">2. </span><span class="content">Proposal</span><a class="self-link" href="#proposal"></a></h2>
-   <p>This paper proposes a new way of declaring a member function that will allow for deducing the type and value category of the class instance parameter, while still being invokable as a member function.</p>
+   <p>This paper proposes a new way of declaring a member function that will allow for deducing the type and value category of the class instance parameter, while still being invocable as a member function.</p>
    <p>We propose allowing the first parameter of a member function to be named <code class="highlight"><span class="k">this</span></code>, with the following restrictions:</p>
    <ul>
     <li data-md="">
@@ -1628,7 +1629,7 @@ pre .property::before, pre .property::after {
       <li data-md="">
        <p>a reference to possibly <em>cv</em>-qualified function template parameter</p>
       <li data-md="">
-       <p>a reference to possibly <em>cv</em>-qualified _injected-class-name_</p>
+       <p>a reference to possibly <em>cv</em>-qualified <em>injected-class-name</em></p>
      </ul>
    </ul>
    <p>The <code class="highlight"><span class="k">this</span></code> parameter will bind to the implicit object argument, as if it were passed as the first argument to a non-member function with the same signature.</p>
@@ -1639,7 +1640,7 @@ pre .property::before, pre .property::after {
     <span class="kt">void</span> <span class="n">bar</span><span class="p">(</span><span class="n">This</span><span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">,</span> <span class="kt">int</span> <span class="n">i</span><span class="p">);</span>
 <span class="p">};</span>
 
-<span class="c1">// X::foo is member function taking no arguments, X::bar takes one</span>
+<span class="c1">// X::foo is member function taking no arguments, X::bar takes one </span>
 <span class="c1">// argument of type int</span>
 <span class="c1"></span><span class="n">X</span> <span class="n">x</span><span class="p">;</span>
 <span class="n">x</span><span class="p">.</span><span class="n">foo</span><span class="p">();</span>
@@ -1684,7 +1685,7 @@ pre .property::before, pre .property::after {
 <span class="n">d</span><span class="p">.</span><span class="n">do_stuff</span><span class="p">();</span>  <span class="c1">// invokes B::do_stuff&lt;B&amp;>, not B::do_stuff&lt;D&amp;></span>
 </pre>
    <p>Within these member functions, the keyword <code class="highlight"><span class="k">this</span></code> will be used as a reference, not as a pointer. While inconsistent with usage in normal member functions, it is more consistent with its declaration as a parameter of reference type and its ability to be deduced as a forwarding reference. This difference will be a signal to users that this is a different kind of member function, additionally obviating any questions about checking against <code class="highlight"><span class="k">nullptr</span></code>.</p>
-   <p>Accessing members would be done via <code class="highlight"><span class="k">this</span><span class="p">.</span><span class="n">mem</span></code> and not <code class="highlight"><span class="k">this</span><span class="o">-></span><span class="n">mem</span></code>. There is no implicit <code class="highlight"><span class="k">this</span></code> object, since we now have an _explicit_ instance parameter, so all member access must be qualified:</p>
+   <p>Accessing members would be done via <code class="highlight"><span class="k">this</span><span class="p">.</span><span class="n">mem</span></code> and not <code class="highlight"><span class="k">this</span><span class="o">-></span><span class="n">mem</span></code>. There is no implicit <code class="highlight"><span class="k">this</span></code> object, since we now have an <em>explicit</em> instance parameter, so all member access must be qualified:</p>
 <pre class="highlight"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span>
 <span class="k">class</span> <span class="nc">Z</span> <span class="p">{</span>
     <span class="n">T</span> <span class="n">value</span><span class="p">;</span>
@@ -1696,7 +1697,7 @@ pre .property::before, pre .property::after {
 <span class="c1"></span>    <span class="p">}</span>
 <span class="p">};</span>
 </pre>
-   <p>The only allowed types for the <code class="highlight"><span class="k">this</span></code> parameter are reference to function template parameter and reference to _injected-class-name_. We do not expect the latter form to be used very often, but likewise we see no reason to artificially limit the proposal to templates.</p>
+   <p>The only allowed types for the <code class="highlight"><span class="k">this</span></code> parameter are reference to function template parameter and reference to <em>injected-class-name</em>. We do not expect the latter form to be used very often, but likewise we see no reason to artificially limit the proposal to templates.</p>
 <pre class="highlight"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span>
 <span class="k">struct</span> <span class="n">B</span> <span class="p">{</span>
     <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="o">></span>
@@ -1745,12 +1746,63 @@ pre .property::before, pre .property::after {
     <span class="k">decltype</span><span class="p">(</span><span class="k">auto</span><span class="p">)</span> <span class="n">foo</span><span class="p">()</span> <span class="n">This</span><span class="o">&amp;&amp;</span> <span class="p">{</span>
         <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">This</span><span class="o">></span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">).</span><span class="n">value</span><span class="p">;</span>
     <span class="p">}</span>
+
+    <span class="c1">// another alternative</span>
+<span class="c1"></span>    <span class="k">decltype</span><span class="p">(</span><span class="k">auto</span><span class="p">)</span> <span class="n">foo</span><span class="p">()</span> <span class="k">auto</span><span class="o">&amp;&amp;</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="k">decltype</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">)</span><span class="o">></span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">).</span><span class="n">value</span><span class="p">;</span>
+    <span class="p">}</span>
 <span class="p">};</span>
 </pre>
-   <h2 class="heading settled" data-level="3" id="examples"><span class="secno">3. </span><span class="content">Examples</span><a class="self-link" href="#examples"></a></h2>
-   <h3 class="heading settled" data-level="3.1" id="deduplicating-code"><span class="secno">3.1. </span><span class="content">Deduplicating Code</span><a class="self-link" href="#deduplicating-code"></a></h3>
+   <h2 class="heading settled" data-level="3" id="minimal-translations"><span class="secno">3. </span><span class="content">Minimal Translations</span><a class="self-link" href="#minimal-translations"></a></h2>
+   <p>The most common qualifier overload sets for member functions are:</p>
+   <ol>
+    <li data-md="">
+     <p><code class="highlight"><span class="k">const</span></code> and non-<code class="highlight"><span class="k">const</span></code></p>
+    <li data-md="">
+     <p><code class="highlight"><span class="o">&amp;</span></code>, <code class="highlight"><span class="k">const</span><span class="o">&amp;</span></code>, <code class="highlight"><span class="o">&amp;&amp;</span></code>, and <code class="highlight"><span class="k">const</span><span class="o">&amp;&amp;</span></code></p>
+    <li data-md="">
+     <p><code class="highlight"><span class="k">const</span><span class="o">&amp;</span></code> and <code class="highlight"><span class="o">&amp;&amp;</span></code></p>
+   </ol>
+   <p>Some examples:</p>
+   <table>
+    <tbody>
+     <tr>
+      <th>1
+      <th>2
+      <th>3
+     <tr>
+      <td>
+<pre class="highlight"><span class="k">struct</span> <span class="n">foo</span> <span class="p">{</span>
+  <span class="kt">void</span> <span class="n">bar</span><span class="p">();</span>
+  <span class="kt">void</span> <span class="nf">bar</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+<span class="p">};</span>
+</pre>
+      <td>
+<pre class="highlight"><span class="k">struct</span> <span class="n">foo</span> <span class="p">{</span>
+  <span class="kt">void</span> <span class="n">bar</span><span class="p">()</span> <span class="o">&amp;</span><span class="p">;</span>
+  <span class="kt">void</span> <span class="nf">bar</span><span class="p">()</span> <span class="k">const</span><span class="o">&amp;</span><span class="p">;</span>
+  <span class="kt">void</span> <span class="nf">bar</span><span class="p">()</span> <span class="o">&amp;&amp;</span><span class="p">;</span>
+  <span class="kt">void</span> <span class="nf">bar</span><span class="p">()</span> <span class="k">const</span><span class="o">&amp;&amp;</span><span class="p">;</span>  
+<span class="p">};</span>
+</pre>
+      <td>
+<pre class="highlight"><span class="k">struct</span> <span class="n">foo</span> <span class="p">{</span>
+  <span class="kt">void</span> <span class="n">bar</span><span class="p">()</span> <span class="k">const</span><span class="o">&amp;</span><span class="p">;</span>
+  <span class="kt">void</span> <span class="nf">bar</span><span class="p">()</span> <span class="o">&amp;&amp;</span><span class="p">;</span>
+<span class="p">};</span>
+</pre>
+   </table>
+   <p>The all three of these can be handled by a single perfect-forwarding overload, like this:</p>
+<pre class="highlight"><span class="k">struct</span> <span class="n">foo</span> <span class="p">{</span>
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">This</span><span class="o">></span>
+    <span class="kt">void</span> <span class="n">bar</span> <span class="p">(</span><span class="n">This</span><span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">);</span>
+<span class="p">};</span>
+</pre>
+   <p>This overload is callable for all <code class="highlight"><span class="k">const</span></code>- and ref-qualified object parameters, just like the above examples. It is also callable for <code class="highlight"><span class="k">volatile</span></code>-qualified objects, so the code is not entirely equivalent; however, the <code class="highlight"><span class="k">volatile</span></code> versions are unlikely to be invalid and more likely to be simply left out for the sake of brevity. The only major difference is in the third case, where non-<code class="highlight"><span class="k">const</span></code> lvalue arguments would be non-<code class="highlight"><span class="k">const</span></code> inside the function body, and <code class="highlight"><span class="k">const</span></code> rvalue arguments would be <code class="highlight"><span class="k">const</span><span class="o">&amp;&amp;</span></code> instead of <code class="highlight"><span class="k">const</span><span class="o">&amp;</span></code>. Again, this is unlikely to cause correctness issues unless <code class="highlight"><span class="k">this</span></code> has other member functions called on it which do semantically different things depending on the cv-qualification of <code class="highlight"><span class="k">this</span></code>.</p>
+   <h2 class="heading settled" data-level="4" id="real-world-examples"><span class="secno">4. </span><span class="content">Real-World Examples</span><a class="self-link" href="#real-world-examples"></a></h2>
+   <h3 class="heading settled" data-level="4.1" id="deduplicating-code"><span class="secno">4.1. </span><span class="content">Deduplicating Code</span><a class="self-link" href="#deduplicating-code"></a></h3>
    <p>This proposal can de-duplicate and de-quadruplicate a large amount of code. In each case, the single function is only slightly more complex than the initial two or four, which makes for a huge win. What follows are a few examples of how repeated code can be reduced.</p>
-   <p>The particular implementation of optional is Simon’s, and can be viewed on <a href="https://github.com/TartanLlama/optional">GitHub</a>, and this example includes some functions that are proposed in P0798, with minor changes to better suit this format:</p>
+   <p>The particular implementation of optional is Simon’s, and can be viewed on <a href="https://github.com/TartanLlama/optional">GitHub</a>, and this example includes some functions that are proposed in [\[P0798\]](https://wg21.link/p0798), with minor changes to better suit this format:</p>
    <table>
     <tbody>
      <tr>
@@ -1779,7 +1831,7 @@ pre .property::before, pre .property::after {
 <pre class="highlight"><span class="k">class</span> <span class="nc">TextBlock</span> <span class="p">{</span>
 <span class="k">public</span><span class="o">:</span>
   <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="o">></span>
-  <span class="k">auto</span><span class="o">&amp;</span> <span class="k">operator</span><span class="p">[](</span><span class="n">This</span><span class="o">&amp;</span> <span class="k">this</span><span class="p">,</span>
+  <span class="k">auto</span><span class="o">&amp;</span> <span class="k">operator</span><span class="p">[](</span><span class="n">This</span><span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">,</span>
                    <span class="n">std</span><span class="o">::</span><span class="kt">size_t</span> <span class="n">position</span><span class="p">)</span> <span class="p">{</span>
     <span class="c1">// ...</span>
 <span class="c1"></span>    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="n">text</span><span class="p">[</span><span class="n">position</span><span class="p">];</span>
@@ -1793,14 +1845,12 @@ pre .property::before, pre .property::after {
 <span class="k">class</span> <span class="nc">optional</span> <span class="p">{</span>
   <span class="c1">// ...</span>
 <span class="c1"></span>  <span class="k">constexpr</span> <span class="n">T</span><span class="o">*</span> <span class="k">operator</span><span class="o">-></span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">addressof</span><span class="p">(</span>
-      <span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">addressof</span><span class="p">(</span><span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">);</span>
   <span class="p">}</span>
 
   <span class="k">constexpr</span> <span class="k">const</span> <span class="n">T</span><span class="o">*</span>
   <span class="k">operator</span><span class="o">-></span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">addressof</span><span class="p">(</span>
-      <span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">addressof</span><span class="p">(</span><span class="k">this</span><span class="o">-></span><span class="n">m_value</span><span class="p">);</span>
   <span class="p">}</span>
   <span class="c1">// ...</span>
 <span class="c1"></span><span class="p">};</span>
@@ -1810,7 +1860,7 @@ pre .property::before, pre .property::after {
 <span class="k">class</span> <span class="nc">optional</span> <span class="p">{</span>
   <span class="c1">// ...</span>
 <span class="c1"></span>  <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="o">></span>
-  <span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span><span class="o">-></span><span class="p">(</span><span class="n">This</span><span class="o">&amp;</span> <span class="k">this</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">constexpr</span> <span class="k">auto</span> <span class="k">operator</span><span class="o">-></span><span class="p">(</span><span class="n">This</span><span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">addressof</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">m_value</span><span class="p">);</span>
   <span class="p">}</span>
   <span class="c1">// ...</span>
@@ -1955,8 +2005,8 @@ pre .property::before, pre .property::after {
 <span class="c1"></span>  <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="p">,</span> <span class="k">typename</span> <span class="n">F</span><span class="o">></span>
   <span class="k">constexpr</span> <span class="k">auto</span>
   <span class="n">and_then</span><span class="p">(</span><span class="n">This</span><span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">,</span> <span class="n">F</span><span class="o">&amp;&amp;</span> <span class="n">f</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">{</span>
-    <span class="k">using</span> <span class="n">val</span> <span class="o">=</span> <span class="k">decltype</span><span class="p">(</span>
-        <span class="n">forward</span><span class="o">&lt;</span><span class="n">This</span><span class="o">></span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="n">m_value</span><span class="p">);</span>
+    <span class="k">using</span> <span class="n">val</span> <span class="o">=</span> <span class="k">decltype</span><span class="p">((</span>
+        <span class="n">forward</span><span class="o">&lt;</span><span class="n">This</span><span class="o">></span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="n">m_value</span><span class="p">));</span>
     <span class="k">using</span> <span class="n">result</span> <span class="o">=</span> <span class="n">invoke_result_t</span><span class="o">&lt;</span><span class="n">F</span><span class="p">,</span> <span class="n">val</span><span class="o">></span><span class="p">;</span>
 
     <span class="k">static_assert</span><span class="p">(</span>
@@ -1975,8 +2025,8 @@ pre .property::before, pre .property::after {
    </table>
    <p>Keep in mind that there are a few more functions in P0798 that have this lead to this explosion of overloads, so the code difference and clarity is dramatic.</p>
    <p>For those that dislike returning auto in these cases, it is very easy to write a metafunction that matches the appropriate qualifiers from a type. Certainly simpler than copying and pasting code and hoping that the minor changes were made correctly in every case.</p>
-   <h3 class="heading settled" data-level="3.2" id="sfinae-friendly-callables"><span class="secno">3.2. </span><span class="content">SFINAE-friendly callables</span><a class="self-link" href="#sfinae-friendly-callables"></a></h3>
-   <p>A seemingly unrelated problem to the question of code quadruplication is that of writing these numerous overloads for function wrappers, as demonstrated in P0826. <code class="highlight"><span class="n">std</span><span class="o">::</span><span class="n">not_fn</span></code> is specified to behave as if:</p>
+   <h3 class="heading settled" data-level="4.2" id="sfinae-friendly-callables"><span class="secno">4.2. </span><span class="content">SFINAE-friendly callables</span><a class="self-link" href="#sfinae-friendly-callables"></a></h3>
+   <p>A seemingly unrelated problem to the question of code quadruplication is that of writing these numerous overloads for function wrappers, as demonstrated in [\[P0826\]](https://wg21.link/p0826). Consider what happens if we implement <code class="highlight"><span class="n">std</span><span class="o">::</span><span class="n">not_fn</span><span class="p">()</span></code>, as currently specified:</p>
 <pre class="highlight"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">F</span><span class="o">></span>
 <span class="k">class</span> <span class="nc">call_wrapper</span> <span class="p">{</span>
     <span class="n">F</span> <span class="n">f</span><span class="p">;</span>
@@ -1984,17 +2034,36 @@ pre .property::before, pre .property::after {
     <span class="c1">// ...</span>
 <span class="c1"></span>    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span><span class="p">...</span> <span class="n">Args</span><span class="o">></span>
     <span class="k">auto</span> <span class="k">operator</span><span class="p">()(</span><span class="n">Args</span><span class="o">&amp;&amp;</span><span class="p">...</span> <span class="p">)</span> <span class="o">&amp;</span>
-        <span class="o">-></span> <span class="k">decltype</span><span class="p">(</span><span class="o">!</span><span class="n">declval</span><span class="o">&lt;</span><span class="n">invoke_result_t</span><span class="o">&lt;</span><span class="n">F</span><span class="o">&amp;</span><span class="p">,</span> <span class="n">Args</span><span class="p">...</span><span class="o">>></span><span class="p">());</span>
+        <span class="o">-></span> <span class="k">decltype</span><span class="p">(</span><span class="o">!</span><span class="n">declval</span><span class="o">&lt;</span><span class="n">invoke_result_t</span><span class="o">&lt;</span><span class="n">F</span><span class="o">&amp;</span><span class="p">,</span> <span class="n">Args</span><span class="p">...</span><span class="o">>></span><span class="p">())</span>'
 
     <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span><span class="p">...</span> <span class="n">Args</span><span class="o">></span>
     <span class="k">auto</span> <span class="k">operator</span><span class="p">()(</span><span class="n">Args</span><span class="o">&amp;&amp;</span><span class="p">...</span> <span class="p">)</span> <span class="k">const</span><span class="o">&amp;</span>
         <span class="o">-></span> <span class="k">decltype</span><span class="p">(</span><span class="o">!</span><span class="n">declval</span><span class="o">&lt;</span><span class="n">invoke_result_t</span><span class="o">&lt;</span><span class="k">const</span> <span class="n">F</span><span class="o">&amp;</span><span class="p">,</span> <span class="n">Args</span><span class="p">...</span><span class="o">>></span><span class="p">());</span>
 
-    <span class="c1">// ...</span>
+    <span class="c1">// ... same for &amp;&amp; and const &amp;&amp; ...</span>
 <span class="c1"></span><span class="p">};</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">F</span><span class="o">></span>
+<span class="k">auto</span> <span class="n">not_fn</span><span class="p">(</span><span class="n">F</span><span class="o">&amp;&amp;</span> <span class="n">f</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">call_wrapper</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">decay_t</span><span class="o">&lt;</span><span class="n">F</span><span class="o">>></span><span class="p">{</span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">F</span><span class="o">></span><span class="p">(</span><span class="n">f</span><span class="p">)};</span>
+<span class="p">}</span>
 </pre>
-   <p>which has the surprise result of incorrectly propagating the <em>cv</em>-qualifiers of the call wrapper. From the paper:</p>
-<pre class="highlight"><span class="k">struct</span> <span class="n">fun</span> <span class="p">{</span>
+   <p>As described in the paper, this implementation has two pathological cases: one in which the callable is SFINAE-unfriendly (which would cause a call to be ill-formed, when it could otherwise work), and one in which overload is deleted (which would cause a call to fallback to a different overload, when it should fail):</p>
+<pre class="highlight"><span class="k">struct</span> <span class="n">unfriendly</span> <span class="p">{</span>
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span>
+    <span class="k">auto</span> <span class="k">operator</span><span class="p">()(</span><span class="n">T</span> <span class="n">v</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">static_assert</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">is_same_v</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="kt">int</span><span class="o">></span><span class="p">);</span>
+        <span class="k">return</span> <span class="n">v</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">></span>
+    <span class="k">auto</span> <span class="k">operator</span><span class="p">()(</span><span class="n">T</span> <span class="n">v</span><span class="p">)</span> <span class="k">const</span> <span class="p">{</span>
+        <span class="k">static_assert</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">is_same_v</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="kt">double</span><span class="o">></span><span class="p">);</span>
+        <span class="k">return</span> <span class="n">v</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="k">struct</span> <span class="n">fun</span> <span class="p">{</span>
     <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span><span class="p">...</span> <span class="n">Args</span><span class="o">></span>
     <span class="kt">void</span> <span class="k">operator</span><span class="p">()(</span><span class="n">Args</span><span class="o">&amp;&amp;</span><span class="p">...)</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span>
 
@@ -2002,21 +2071,20 @@ pre .property::before, pre .property::after {
     <span class="kt">bool</span> <span class="k">operator</span><span class="p">()(</span><span class="n">Args</span><span class="o">&amp;&amp;</span><span class="p">...)</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> true<span class="p">;</span> <span class="p">}</span>
 <span class="p">};</span>
 
-<span class="n">std</span><span class="o">::</span><span class="n">not_fn</span><span class="p">(</span><span class="n">fun</span><span class="p">{})();</span> <span class="c1">// ok? Returns false</span>
+<span class="n">std</span><span class="o">::</span><span class="n">not_fn</span><span class="p">(</span><span class="n">unfriendly</span><span class="p">{})(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// static assert!</span>
+<span class="c1"></span><span class="n">std</span><span class="o">::</span><span class="n">not_fn</span><span class="p">(</span><span class="n">fun</span><span class="p">{})();</span>         <span class="c1">// ok!? Returns false</span>
 </pre>
-   <p><code class="highlight"><span class="n">fun</span></code> shouldn’t be invocable unless it’s <code class="highlight"><span class="k">const</span></code>, but the simple approach of quadruplicating the overloads led to a situation where we can fallback to the const overload of the call wrapper (the <code class="highlight"><span class="o">&amp;&amp;</span></code>-qualified overload led to a substitution failure so we were able to fall back to the <code class="highlight"><span class="k">const</span><span class="o">&amp;&amp;</span></code>-qualified one, which succeeded). Implementing this correctly, while still preserving SFINAE-friendliness, is decidedly non-trivial.</p>
-   <p>This proposal, however, offers a very simple solution to this problem. Deduce <code class="highlight"><span class="k">this</span></code>. The following is a complete implementation of <code class="highlight"><span class="n">std</span><span class="o">::</span><span class="n">not_fn</span></code>:</p>
+   <p>Gracefully handling SFINAE-unfriendly callables is <strong>not solvable</strong> in C++ today. Preventing fallback can be solved by the addition of yet another four overloads, so that each of the four <em>cv</em>/ref-qualifiers leads to a pair of overloads: one enabled and one <code class="highlight"><span class="n">deleted</span></code>.</p>
+   <p>This proposal solves both problems by simply allowing <code class="highlight"><span class="k">this</span></code> to be deduced. The following is a complete implementation of <code class="highlight"><span class="n">std</span><span class="o">::</span><span class="n">not_fn</span></code>:</p>
 <pre class="highlight"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">F</span><span class="o">></span>
 <span class="k">struct</span> <span class="n">call_wrapper</span> <span class="p">{</span>
     <span class="n">F</span> <span class="n">f</span><span class="p">;</span>
 
     <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">This</span><span class="p">,</span> <span class="k">typename</span><span class="p">...</span> <span class="n">Args</span><span class="o">></span>
     <span class="k">auto</span> <span class="k">operator</span><span class="p">()(</span><span class="n">This</span><span class="o">&amp;&amp;</span> <span class="k">this</span><span class="p">,</span> <span class="n">Args</span><span class="o">&amp;&amp;</span><span class="p">...</span> <span class="p">)</span>
-        <span class="o">-></span> <span class="k">decltype</span><span class="p">(</span><span class="o">!</span><span class="n">invoke</span><span class="p">(</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">This</span><span class="o">></span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="n">f</span><span class="p">,</span>
-                            <span class="n">forward</span><span class="o">&lt;</span><span class="n">Args</span><span class="o">></span><span class="p">(</span><span class="n">args</span><span class="p">)...));</span>
+        <span class="o">-></span> <span class="k">decltype</span><span class="p">(</span><span class="o">!</span><span class="n">invoke</span><span class="p">(</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">This</span><span class="o">></span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="n">f</span><span class="p">,</span> <span class="n">forward</span><span class="o">&lt;</span><span class="n">Args</span><span class="o">></span><span class="p">(</span><span class="n">args</span><span class="p">)...))</span>
     <span class="p">{</span>
-        <span class="k">return</span> <span class="o">!</span><span class="n">invoke</span><span class="p">(</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">This</span><span class="o">></span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="n">f</span><span class="p">,</span>
-                       <span class="n">forward</span><span class="o">&lt;</span><span class="n">Args</span><span class="o">></span><span class="p">(</span><span class="n">args</span><span class="p">)...);</span>
+        <span class="k">return</span> <span class="o">!</span><span class="n">invoke</span><span class="p">(</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">This</span><span class="o">></span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="n">f</span><span class="p">,</span> <span class="n">forward</span><span class="o">&lt;</span><span class="n">Args</span><span class="o">></span><span class="p">(</span><span class="n">args</span><span class="p">)...);</span>
     <span class="p">}</span>
 <span class="p">};</span>
 
@@ -2025,12 +2093,13 @@ pre .property::before, pre .property::after {
     <span class="k">return</span> <span class="n">call_wrapper</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">decay_t</span><span class="o">&lt;</span><span class="n">F</span><span class="o">>></span><span class="p">{</span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">F</span><span class="o">></span><span class="p">(</span><span class="n">f</span><span class="p">)};</span>
 <span class="p">}</span>
 
-<span class="n">not_fn</span><span class="p">(</span><span class="n">fun</span><span class="p">{})();</span> <span class="c1">// error</span>
+<span class="n">not_fn</span><span class="p">(</span><span class="n">unfriendly</span><span class="p">{})(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// ok</span>
+<span class="c1"></span><span class="n">not_fn</span><span class="p">(</span><span class="n">fun</span><span class="p">{})();</span>         <span class="c1">// error</span>
 </pre>
-   <p>Here, there is only one overload with everything deduced together, with <code class="highlight"><span class="n">This</span> <span class="o">=</span> <span class="n">fun</span></code>. As this overload is not viable (because <code class="highlight"><span class="n">fun</span></code> is not invocable unless it’s <code class="highlight"><span class="k">const</span></code>), and there is no other overload, overload resolution is complete without a viable candidate. As desired.</p>
-   <h3 class="heading settled" data-level="3.3" id="recursive-lambdas"><span class="secno">3.3. </span><span class="content">Recursive Lambdas</span><a class="self-link" href="#recursive-lambdas"></a></h3>
+   <p>Here, there is only one overload with everything deduced together, with either <code class="highlight"><span class="n">This</span> <span class="o">=</span> <span class="n">fun</span></code> or <code class="highlight"><span class="n">This</span> <span class="o">=</span> <span class="n">poison</span></code> as appropriate. As a result, this singular overload then has precisely the desired behavior: working, for <code class="highlight"><span class="n">unfriendly</span></code>, and not working, for <code class="highlight"><span class="n">fun</span></code>.</p>
+   <h3 class="heading settled" data-level="4.3" id="recursive-lambdas"><span class="secno">4.3. </span><span class="content">Recursive Lambdas</span><a class="self-link" href="#recursive-lambdas"></a></h3>
    <p>This proposal also allows for an alternative solution to implementing a recursive lambda, since now we open up the possibility of allowing a lambda to reference itself:</p>
-<pre class="highlight"><span class="c1">// as proposed in P0839</span>
+<pre class="highlight"><span class="c1">// as proposed in [P0839]</span>
 <span class="c1"></span><span class="k">auto</span> <span class="n">fib</span> <span class="o">=</span> <span class="p">[]</span> <span class="n">self</span> <span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="k">return</span> <span class="n">n</span><span class="p">;</span>
     <span class="k">return</span> <span class="nf">self</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">self</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">2</span><span class="p">);</span>
@@ -2042,14 +2111,14 @@ pre .property::before, pre .property::after {
     <span class="k">return</span> <span class="nf">this</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="k">this</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">2</span><span class="p">);</span>
 <span class="p">};</span>
 </pre>
-   <p>In the specific case of lambdas, a lambda could both capture <code class="highlight"><span class="k">this</span></code> and take a generic parameter named <code class="highlight"><span class="k">this</span></code>. If this happens, use of <code class="highlight"><span class="k">this</span></code> would refer to the parameter (and hence, the lambda itself) and not the <code class="highlight"><span class="k">this</span></code> pointer of the outer-most class.</p>
+   <p>In the specific case of lambdas, a lambda could both capture <code class="highlight"><span class="k">this</span></code> and take a generic parameter named <code class="highlight"><span class="k">this</span></code>. If this happens, use of <code class="highlight"><span class="k">this</span></code> would refer to the parameter (and hence, the lambda itself) and not the <code class="highlight"><span class="k">this</span></code> pointer of the outer-most class. This preference follows the normal scoping rules.</p>
 <pre class="highlight"><span class="k">struct</span> <span class="n">A</span> <span class="p">{</span>
-	<span class="kt">int</span> <span class="n">bar</span><span class="p">();</span>
+    <span class="kt">int</span> <span class="n">bar</span><span class="p">();</span>
 
     <span class="k">auto</span> <span class="nf">foo</span><span class="p">()</span> <span class="p">{</span>
-	    <span class="k">return</span> <span class="p">[</span><span class="k">this</span><span class="p">](</span><span class="k">auto</span><span class="o">&amp;</span> <span class="k">this</span><span class="p">,</span> <span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
-		    <span class="k">return</span> <span class="k">this</span><span class="o">-></span><span class="n">bar</span><span class="p">()</span> <span class="o">+</span> <span class="n">n</span><span class="p">;</span> <span class="c1">// error: no operator->() for this lambda</span>
-<span class="c1"></span>	    <span class="p">};</span>
+        <span class="k">return</span> <span class="p">[</span><span class="k">this</span><span class="p">](</span><span class="k">auto</span><span class="o">&amp;</span> <span class="k">this</span><span class="p">,</span> <span class="kt">int</span> <span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">this</span><span class="o">-></span><span class="n">bar</span><span class="p">()</span> <span class="o">+</span> <span class="n">n</span><span class="p">;</span> <span class="c1">// error: no operator->() for this lambda</span>
+<span class="c1"></span>        <span class="p">};</span>
     <span class="p">}</span>
 <span class="p">};</span>
 </pre>
